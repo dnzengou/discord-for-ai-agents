@@ -1,0 +1,68 @@
+{
+  "name": "Gaming Community",
+  "description": "Multi-game community with squad voice rooms, LFG, and clip-sharing.",
+  "guild": {
+    "verification_level": "low",
+    "explicit_content_filter": "members_without_roles",
+    "default_message_notifications": "only_mentions"
+  },
+  "roles": [
+    {
+      "name": "Mod",
+      "color": "#5865F2",
+      "permissions": [
+        "kick_members",
+        "ban_members",
+        "manage_messages",
+        "moderate_members",
+        "view_audit_log"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Squad Leader",
+      "color": "#EB459E",
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Veteran",
+      "color": "#FEE75C",
+      "hoist": true,
+      "mentionable": false
+    }
+  ],
+  "categories": [
+    { "name": "Welcome" },
+    { "name": "General" },
+    { "name": "Games" },
+    { "name": "Voice Rooms" }
+  ],
+  "channels": [
+    { "name": "rules", "type": "text", "category": "Welcome", "topic": "Read these before posting." },
+    { "name": "announcements", "type": "text", "category": "Welcome", "topic": "Server news and updates." },
+    { "name": "introductions", "type": "text", "category": "Welcome", "topic": "Tell us your favorite game." },
+    { "name": "general", "type": "text", "category": "General", "topic": "Off-topic chat." },
+    { "name": "memes", "type": "text", "category": "General", "topic": "Post your best." },
+    { "name": "lfg", "type": "text", "category": "Games", "topic": "Looking for group? Post here." },
+    { "name": "clips-and-highlights", "type": "text", "category": "Games", "topic": "Share your plays." },
+    { "name": "Lobby", "type": "voice", "category": "Voice Rooms", "user_limit": 10 },
+    { "name": "Squad 1", "type": "voice", "category": "Voice Rooms", "user_limit": 5 },
+    { "name": "Squad 2", "type": "voice", "category": "Voice Rooms", "user_limit": 5 }
+  ],
+  "automod_rules": [
+    {
+      "name": "No slurs",
+      "trigger": "keyword_preset",
+      "presets": ["slurs"],
+      "block_message": "That language isn't welcome here."
+    },
+    {
+      "name": "Mention spam",
+      "trigger": "mention_spam",
+      "mention_total_limit": 8,
+      "block_message": true
+    }
+  ]
+}

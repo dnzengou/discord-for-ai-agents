@@ -1,0 +1,54 @@
+{
+  "name": "Content Creator",
+  "description": "Creator's hub with announcements, fan chat, scheduled streams, and tier-gated channels.",
+  "guild": {
+    "verification_level": "low",
+    "default_message_notifications": "only_mentions"
+  },
+  "roles": [
+    {
+      "name": "Moderator",
+      "color": "#5865F2",
+      "permissions": ["kick_members", "ban_members", "manage_messages", "moderate_members"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Subscriber",
+      "color": "#EB459E",
+      "hoist": true,
+      "mentionable": false
+    },
+    {
+      "name": "Top Tier Supporter",
+      "color": "#FEE75C",
+      "hoist": true,
+      "mentionable": false
+    }
+  ],
+  "categories": [
+    { "name": "Info" },
+    { "name": "Community" },
+    { "name": "Streams" },
+    { "name": "Subscriber Lounge" }
+  ],
+  "channels": [
+    { "name": "rules", "type": "text", "category": "Info", "topic": "Server rules and FAQs." },
+    { "name": "announcements", "type": "text", "category": "Info", "topic": "Stream schedule, releases, news." },
+    { "name": "schedule", "type": "text", "category": "Info", "topic": "Upcoming streams and content drops." },
+    { "name": "general", "type": "text", "category": "Community", "topic": "Hang out with the community." },
+    { "name": "fan-art", "type": "text", "category": "Community", "topic": "Share your art!" },
+    { "name": "Stream Stage", "type": "stage", "category": "Streams" },
+    { "name": "Watch Party", "type": "voice", "category": "Streams", "user_limit": 25 },
+    { "name": "subs-only", "type": "text", "category": "Subscriber Lounge", "topic": "Behind the scenes for subscribers." },
+    { "name": "Subscriber Voice", "type": "voice", "category": "Subscriber Lounge" }
+  ],
+  "automod_rules": [
+    {
+      "name": "No slurs",
+      "trigger": "keyword_preset",
+      "presets": ["slurs"],
+      "block_message": "Please keep it respectful."
+    }
+  ]
+}

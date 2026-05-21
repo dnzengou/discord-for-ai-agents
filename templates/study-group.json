@@ -1,0 +1,47 @@
+{
+  "name": "Study Group",
+  "description": "Subject-organized chat for students with quiet study voice rooms and homework help.",
+  "guild": {
+    "verification_level": "medium",
+    "explicit_content_filter": "all_members",
+    "default_message_notifications": "only_mentions"
+  },
+  "roles": [
+    {
+      "name": "Tutor",
+      "color": "#57F287",
+      "permissions": ["manage_messages", "moderate_members"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Student",
+      "color": "#5865F2",
+      "hoist": true,
+      "mentionable": false
+    }
+  ],
+  "categories": [
+    { "name": "Start Here" },
+    { "name": "Subjects" },
+    { "name": "Quiet Study" }
+  ],
+  "channels": [
+    { "name": "rules", "type": "text", "category": "Start Here", "topic": "Server rules and code of conduct." },
+    { "name": "introductions", "type": "text", "category": "Start Here", "topic": "Tell us your year and what you study." },
+    { "name": "math", "type": "text", "category": "Subjects", "topic": "Math homework help and discussion." },
+    { "name": "science", "type": "text", "category": "Subjects", "topic": "Bio, chem, physics — ask away." },
+    { "name": "humanities", "type": "text", "category": "Subjects", "topic": "History, lit, philosophy." },
+    { "name": "computer-science", "type": "text", "category": "Subjects", "topic": "CS coursework, algorithms, projects." },
+    { "name": "Study Hall 1", "type": "voice", "category": "Quiet Study", "user_limit": 8 },
+    { "name": "Study Hall 2", "type": "voice", "category": "Quiet Study", "user_limit": 8 }
+  ],
+  "automod_rules": [
+    {
+      "name": "Keep it study-friendly",
+      "trigger": "keyword_preset",
+      "presets": ["profanity", "slurs"],
+      "block_message": "Please keep the language study-friendly."
+    }
+  ]
+}

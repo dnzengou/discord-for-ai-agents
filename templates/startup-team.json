@@ -1,0 +1,84 @@
+{
+  "name": "Startup Team",
+  "description": "Internal workspace for a small startup — structured by function, async-first, no noise.",
+  "guild": {
+    "verification_level": "low",
+    "default_message_notifications": "only_mentions",
+    "explicit_content_filter": "all_members"
+  },
+  "roles": [
+    {
+      "name": "Founder",
+      "color": "#ED4245",
+      "permissions": ["administrator"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Engineering",
+      "color": "#5865F2",
+      "permissions": ["send_messages", "view_channel", "manage_messages", "manage_threads"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Design",
+      "color": "#EB459E",
+      "permissions": ["send_messages", "view_channel", "manage_threads"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Growth",
+      "color": "#57F287",
+      "permissions": ["send_messages", "view_channel", "manage_threads"],
+      "hoist": true,
+      "mentionable": true
+    }
+  ],
+  "categories": [
+    { "name": "Company" },
+    { "name": "Engineering" },
+    { "name": "Product & Design" },
+    { "name": "Growth" },
+    { "name": "Ops" },
+    { "name": "Social" },
+    { "name": "Voice" }
+  ],
+  "channels": [
+    { "name": "announcements", "type": "announcement", "category": "Company", "topic": "All-hands updates from founders. Follow for crosspost." },
+    { "name": "wins", "type": "text", "category": "Company", "topic": "Celebrate every ship, customer, and milestone." },
+    { "name": "strategy", "type": "text", "category": "Company", "topic": "OKRs, roadmap discussions, big bets." },
+    { "name": "general-eng", "type": "text", "category": "Engineering", "topic": "Eng discussions, questions, random." },
+    { "name": "incidents", "type": "text", "category": "Engineering", "topic": "Active incidents and post-mortems." },
+    { "name": "deploys", "type": "text", "category": "Engineering", "topic": "Deploy log — bot or manual. Every prod change." },
+    { "name": "code-review", "type": "forum", "category": "Engineering", "topic": "PR reviews and technical feedback." },
+    { "name": "design-feedback", "type": "forum", "category": "Product & Design", "topic": "Drop Figma links. Ask for critique." },
+    { "name": "product", "type": "text", "category": "Product & Design", "topic": "Features, specs, prioritization." },
+    { "name": "user-research", "type": "text", "category": "Product & Design", "topic": "Customer calls, feedback, insights." },
+    { "name": "marketing", "type": "text", "category": "Growth", "topic": "Campaigns, copy, channel experiments." },
+    { "name": "metrics", "type": "text", "category": "Growth", "topic": "Weekly KPIs and growth experiments." },
+    { "name": "finance", "type": "text", "category": "Ops", "topic": "Invoices, runway, burn. Founders only by default." },
+    { "name": "hiring", "type": "text", "category": "Ops", "topic": "Open roles, pipelines, interview feedback." },
+    { "name": "tools-and-vendors", "type": "text", "category": "Ops", "topic": "SaaS stack, access requests, renewals." },
+    { "name": "random", "type": "text", "category": "Social", "topic": "Memes, music, not-work." },
+    { "name": "reads-and-links", "type": "text", "category": "Social", "topic": "Articles, podcasts, threads worth sharing." },
+    { "name": "Standup", "type": "voice", "category": "Voice", "user_limit": 20 },
+    { "name": "Focus", "type": "voice", "category": "Voice", "user_limit": 6 },
+    { "name": "AFK", "type": "voice", "category": "Voice" }
+  ],
+  "automod_rules": [
+    {
+      "name": "Block slurs",
+      "trigger": "keyword_preset",
+      "presets": ["slurs"],
+      "block_message": "Keep it professional."
+    },
+    {
+      "name": "Mention guard",
+      "trigger": "mention_spam",
+      "mention_total_limit": 5,
+      "block_message": true
+    }
+  ]
+}

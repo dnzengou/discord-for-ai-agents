@@ -1,0 +1,58 @@
+{
+  "name": "Dev Community",
+  "description": "Developer hangout with language channels, code review, and project showcase.",
+  "guild": {
+    "verification_level": "low",
+    "default_message_notifications": "only_mentions"
+  },
+  "roles": [
+    {
+      "name": "Maintainer",
+      "color": "#FEE75C",
+      "permissions": ["manage_messages", "moderate_members", "manage_threads"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Contributor",
+      "color": "#57F287",
+      "hoist": true,
+      "mentionable": false
+    }
+  ],
+  "categories": [
+    { "name": "Welcome" },
+    { "name": "Discussion" },
+    { "name": "Languages" },
+    { "name": "Showcase" }
+  ],
+  "channels": [
+    { "name": "rules", "type": "text", "category": "Welcome", "topic": "Read these before posting." },
+    { "name": "announcements", "type": "text", "category": "Welcome", "topic": "Releases, talks, community news." },
+    { "name": "introductions", "type": "text", "category": "Welcome", "topic": "What do you build?" },
+    { "name": "general", "type": "text", "category": "Discussion", "topic": "Anything dev-related." },
+    { "name": "career-talk", "type": "text", "category": "Discussion", "topic": "Jobs, interviews, career growth." },
+    { "name": "code-review", "type": "text", "category": "Discussion", "topic": "Drop snippets, get feedback." },
+    { "name": "javascript", "type": "text", "category": "Languages", "topic": "JS, TS, Node, browsers." },
+    { "name": "python", "type": "text", "category": "Languages", "topic": "Python, frameworks, data." },
+    { "name": "rust", "type": "text", "category": "Languages", "topic": "Rust language, ecosystem, crates." },
+    { "name": "go", "type": "text", "category": "Languages", "topic": "Go, modules, services." },
+    { "name": "show-and-tell", "type": "text", "category": "Showcase", "topic": "Share what you're building." },
+    { "name": "open-source", "type": "text", "category": "Showcase", "topic": "OSS contributions and projects." }
+  ],
+  "automod_rules": [
+    {
+      "name": "Block invite spam",
+      "trigger": "keyword",
+      "keyword_filter": ["discord.gg/", "discord.com/invite/"],
+      "block_message": "Server invites aren't allowed without mod permission."
+    },
+    {
+      "name": "Mention raid guard",
+      "trigger": "mention_spam",
+      "mention_total_limit": 6,
+      "mention_raid_protection_enabled": true,
+      "block_message": true
+    }
+  ]
+}

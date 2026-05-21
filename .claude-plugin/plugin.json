@@ -1,0 +1,56 @@
+{
+  "name": "discord",
+  "description": "Discord server admin via natural language — channels, roles, embeds, AutoMod, welcome screens, scheduled events, and full server templates",
+  "version": "0.3.0",
+  "author": {
+    "name": "JCodesMore",
+    "url": "https://github.com/JCodesMore"
+  },
+  "homepage": "https://github.com/JCodesMore/discord-for-ai-agents",
+  "repository": "https://github.com/JCodesMore/discord-for-ai-agents",
+  "license": "Apache-2.0",
+  "keywords": [
+    "discord",
+    "mcp",
+    "admin",
+    "guild",
+    "automod",
+    "claude-code"
+  ],
+  "userConfig": {
+    "mfa_enabled": {
+      "type": "boolean",
+      "title": "Bot owner has MFA enabled",
+      "description": "Enable if your Discord account has 2FA on. Some destructive actions (kick/ban/delete) require this flag in production servers.",
+      "default": false,
+      "required": false
+    }
+  },
+  "mcpServers": {
+    "discord": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/start-mcp.mjs"],
+      "env": {
+        "CLAUDE_PLUGIN_DATA": "${CLAUDE_PLUGIN_DATA}",
+        "CLAUDE_PLUGIN_OPTION_MFA_ENABLED": "${user_config.mfa_enabled}"
+      }
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/ensure-deps.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/session-banner.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

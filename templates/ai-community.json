@@ -1,0 +1,88 @@
+{
+  "name": "AI Community",
+  "description": "Hub for AI builders, researchers, and enthusiasts — model releases, project showcases, and tool discussions.",
+  "guild": {
+    "verification_level": "low",
+    "default_message_notifications": "only_mentions",
+    "explicit_content_filter": "members_without_roles"
+  },
+  "roles": [
+    {
+      "name": "Moderator",
+      "color": "#5865F2",
+      "permissions": ["kick_members", "ban_members", "manage_messages", "moderate_members", "manage_threads"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Researcher",
+      "color": "#57F287",
+      "hoist": true,
+      "mentionable": false
+    },
+    {
+      "name": "Builder",
+      "color": "#FEE75C",
+      "hoist": true,
+      "mentionable": false
+    }
+  ],
+  "categories": [
+    { "name": "Welcome" },
+    { "name": "General" },
+    { "name": "Models & Research" },
+    { "name": "Build" },
+    { "name": "Showcase" },
+    { "name": "Voice" }
+  ],
+  "channels": [
+    { "name": "rules", "type": "text", "category": "Welcome", "topic": "Community guidelines. Read before posting." },
+    { "name": "announcements", "type": "announcement", "category": "Welcome", "topic": "Model releases, events, major news." },
+    { "name": "introductions", "type": "text", "category": "Welcome", "topic": "Who are you and what are you building?" },
+    { "name": "general", "type": "text", "category": "General", "topic": "Anything AI — chat, links, hot takes." },
+    { "name": "news-and-papers", "type": "text", "category": "General", "topic": "Drops of the week: papers, releases, blog posts." },
+    { "name": "jobs-and-gigs", "type": "text", "category": "General", "topic": "Hiring? Looking? Post here." },
+    { "name": "llms", "type": "forum", "category": "Models & Research", "topic": "Large language models — architecture, fine-tuning, evals." },
+    { "name": "image-video-models", "type": "text", "category": "Models & Research", "topic": "Diffusion, video gen, multimodal." },
+    { "name": "agents-and-tools", "type": "text", "category": "Models & Research", "topic": "Agentic frameworks, tool use, MCP." },
+    { "name": "evals-and-benchmarks", "type": "text", "category": "Models & Research", "topic": "How do we actually measure this stuff?" },
+    { "name": "api-and-infra", "type": "text", "category": "Build", "topic": "APIs, hosting, inference, cost." },
+    { "name": "prompts-and-rag", "type": "text", "category": "Build", "topic": "Prompt engineering, RAG, context management." },
+    { "name": "help", "type": "forum", "category": "Build", "topic": "Stuck? Ask here. Include your stack and error." },
+    { "name": "show-and-tell", "type": "forum", "category": "Showcase", "topic": "Ship something? Demo it here." },
+    { "name": "open-source", "type": "text", "category": "Showcase", "topic": "OSS AI projects and contributions." },
+    { "name": "Lobby", "type": "voice", "category": "Voice", "user_limit": 15 },
+    { "name": "Study Hall", "type": "voice", "category": "Voice", "user_limit": 8 }
+  ],
+  "welcome_screen": {
+    "enabled": true,
+    "description": "AI builders, researchers, and enthusiasts — discuss models, share projects, get help.",
+    "channels": [
+      { "channel": "rules", "description": "Start here", "emoji_name": "📜" },
+      { "channel": "introductions", "description": "Say hi", "emoji_name": "👋" },
+      { "channel": "show-and-tell", "description": "Share your work", "emoji_name": "🚀" }
+    ]
+  },
+  "automod_rules": [
+    {
+      "name": "Block slurs",
+      "trigger": "keyword_preset",
+      "presets": ["slurs"],
+      "block_message": "Please keep it respectful."
+    },
+    {
+      "name": "Block invite spam",
+      "trigger": "keyword",
+      "keyword_filter": ["discord.gg/", "discord.com/invite/"],
+      "block_message": "Server invites need mod approval.",
+      "exempt_roles": ["Moderator"]
+    },
+    {
+      "name": "Mention raid guard",
+      "trigger": "mention_spam",
+      "mention_total_limit": 8,
+      "mention_raid_protection_enabled": true,
+      "block_message": true
+    }
+  ]
+}
