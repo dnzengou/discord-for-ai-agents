@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discord for AI Agents — Run your server by talking to Claude</title>
+  <meta name="description" content="54 Discord tools. Natural language. Build channels, roles, AutoMod rules and full server templates in under 2 minutes — no menus, no clicking." />
+  <meta property="og:title" content="Discord for AI Agents" />
+  <meta property="og:description" content="Run your Discord server by talking to Claude. 54 tools. 6 templates. ~2 min setup." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & tokens ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d0e11;
+      --surface:    #131519;
+      --surface-2:  #1a1d24;
+      --border:     rgba(255,255,255,.08);
+      --border-2:   rgba(255,255,255,.13);
+      --blurple:    #5865F2;
+      --blurple-dim:#4752c4;
+      --blurple-glow:rgba(88,101,242,.35);
+      --green:      #57F287;
+      --yellow:     #FEE75C;
+      --text:       #e8eaf0;
+      --text-dim:   #8b8fa8;
+      --text-faint: #52566a;
+      --radius:     10px;
+      --radius-lg:  16px;
+      --font:       'Inter', system-ui, sans-serif;
+      --mono:       'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--blurple); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── Nav ───────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+      background: rgba(13,14,17,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: .5rem;
+      font-weight: 700; font-size: 15px; color: var(--text); text-decoration: none;
+    }
+    .nav-logo svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a { color: var(--text-dim); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .45rem 1rem;
+      border-radius: 8px;
+      font-size: 13.5px; font-weight: 600;
+      cursor: pointer; border: none; transition: all .15s;
+    }
+    .btn-primary {
+      background: var(--blurple); color: #fff;
+    }
+    .btn-primary:hover { background: var(--blurple-dim); text-decoration: none; }
+    .btn-ghost {
+      background: transparent; color: var(--text-dim);
+      border: 1px solid var(--border-2);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--border-2); background: var(--surface-2); text-decoration: none; }
+
+    /* ─── Hero ───────────────────────────────────────────────── */
+    .hero {
+      max-width: 780px; margin: 0 auto;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .25rem .75rem;
+      border-radius: 20px;
+      border: 1px solid rgba(88,101,242,.4);
+      background: rgba(88,101,242,.1);
+      font-size: 12.5px; font-weight: 500; color: #a5aaff;
+      margin-bottom: 1.5rem;
+    }
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blurple); display: inline-block; }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(135deg, #e8eaf0 0%, #8b8fa8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--blurple) 0%, #a5aaff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.1rem; color: var(--text-dim);
+      max-width: 540px; margin: 0 auto 2rem;
+    }
+    .hero-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+    .hero-actions .btn { padding: .65rem 1.5rem; font-size: 14px; }
+    .stats {
+      display: flex; justify-content: center; gap: 2.5rem;
+      margin-top: 3rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--text-dim); margin-top: .25rem; font-weight: 500; letter-spacing: .02em; text-transform: uppercase; }
+
+    /* ─── Section shared ─────────────────────────────────────── */
+    section { padding: 4rem 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .section-label {
+      font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+      color: var(--blurple); margin-bottom: .75rem;
+    }
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800;
+      letter-spacing: -.02em; margin-bottom: .75rem;
+    }
+    .section-sub { color: var(--text-dim); max-width: 520px; }
+
+    /* ─── Onboarding steps ───────────────────────────────────── */
+    .onboarding-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .steps {
+      display: flex; flex-direction: column; gap: 0;
+      margin-top: 2.5rem;
+    }
+    .step {
+      display: grid; grid-template-columns: 2.5rem 1fr;
+      gap: 0 1.25rem;
+      position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 1.2rem; top: 2.75rem; bottom: 0;
+      width: 1px;
+      background: var(--border-2);
+    }
+    .step-num {
+      width: 2.25rem; height: 2.25rem;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      background: var(--surface-2); border: 1px solid var(--border-2);
+      color: var(--text-dim);
+      flex-shrink: 0; z-index: 1;
+    }
+    .step.active .step-num {
+      background: var(--blurple); border-color: transparent; color: #fff;
+    }
+    .step.done .step-num {
+      background: rgba(87,242,135,.15); border-color: rgba(87,242,135,.3); color: var(--green);
+    }
+    .step.done .step-num::after { content: '✓'; }
+    .step-body { padding-bottom: 2.25rem; }
+    .step-title { font-size: 1rem; font-weight: 700; margin-bottom: .35rem; color: var(--text); line-height: 1.4; }
+    .step-desc { font-size: 14px; color: var(--text-dim); margin-bottom: .85rem; }
+    .step.done .step-title, .step.done .step-desc { opacity: .5; }
+
+    /* Code block */
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .5rem .75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px; color: var(--text-faint); font-family: var(--mono);
+    }
+    .code-body { padding: .85rem 1rem; font-family: var(--mono); font-size: 13.5px; line-height: 1.6; overflow-x: auto; }
+    .code-body .cmd { color: #a5aaff; }
+    .code-body .arg { color: #7dd3a8; }
+    .copy-btn {
+      display: flex; align-items: center; gap: .3rem;
+      padding: .25rem .6rem; border-radius: 5px;
+      font-size: 11.5px; font-weight: 600;
+      background: var(--surface-2); border: 1px solid var(--border-2);
+      color: var(--text-dim); cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .copy-btn:hover { background: rgba(88,101,242,.15); color: var(--blurple); border-color: rgba(88,101,242,.3); }
+    .copy-btn.copied { color: var(--green); border-color: rgba(87,242,135,.3); background: rgba(87,242,135,.1); }
+
+    /* Sub-steps */
+    .sub-steps { display: flex; flex-direction: column; gap: .5rem; margin-top: .75rem; }
+    .sub-step { display: flex; align-items: flex-start; gap: .6rem; font-size: 13.5px; color: var(--text-dim); }
+    .sub-step .n { color: var(--blurple); font-weight: 700; flex-shrink: 0; font-size: 12px; margin-top: .1rem; }
+
+    /* Example prompts */
+    .prompt-list { display: flex; flex-direction: column; gap: .5rem; }
+    .prompt {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .6rem .85rem;
+      font-family: var(--mono); font-size: 13px; color: var(--text-dim);
+      cursor: pointer; transition: all .15s;
+    }
+    .prompt:hover { border-color: rgba(88,101,242,.4); color: var(--text); background: rgba(88,101,242,.05); }
+    .prompt-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ─── Templates ───────────────────────────────────────────── */
+    .templates-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem; margin-top: 2rem;
+    }
+    .template-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      transition: all .2s;
+      position: relative; overflow: hidden;
+    }
+    .template-card:hover { border-color: var(--border-2); background: var(--surface-2); transform: translateY(-2px); }
+    .template-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--accent, var(--blurple));
+    }
+    .template-icon { font-size: 1.5rem; margin-bottom: .75rem; display: block; }
+    .template-name { font-weight: 700; font-size: 14.5px; margin-bottom: .35rem; }
+    .template-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: .85rem; }
+    .template-meta {
+      display: flex; gap: .5rem; flex-wrap: wrap;
+    }
+    .chip {
+      font-size: 11.5px; font-weight: 600; padding: .2rem .5rem; border-radius: 4px;
+      background: rgba(255,255,255,.06); color: var(--text-dim);
+    }
+    .chip.new { background: rgba(88,101,242,.15); color: #a5aaff; }
+    .template-cmd {
+      display: block; margin-top: .75rem;
+      font-family: var(--mono); font-size: 12px; color: var(--text-faint);
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 5px; padding: .3rem .6rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ─── Capabilities ────────────────────────────────────────── */
+    .caps-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .75rem; margin-top: 2rem;
+    }
+    .cap-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem;
+    }
+    .cap-title { font-size: 13px; font-weight: 700; margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; }
+    .cap-count { font-size: 11px; color: var(--text-faint); font-weight: 400; }
+    .cap-items { display: flex; flex-direction: column; gap: .25rem; }
+    .cap-item { font-size: 12.5px; color: var(--text-dim); font-family: var(--mono); }
+
+    /* ─── Why section ─────────────────────────────────────────── */
+    .why-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem; margin-top: 2rem;
+    }
+    .why-card {
+      padding: 1.25rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    }
+    .why-icon { font-size: 1.4rem; margin-bottom: .6rem; display: block; }
+    .why-title { font-size: 14.5px; font-weight: 700; margin-bottom: .4rem; }
+    .why-body { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+
+    /* ─── CTA banner ──────────────────────────────────────────── */
+    .cta-section {
+      text-align: center;
+      padding: 5rem 2rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(88,101,242,.15) 0%, transparent 70%), var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .cta-section h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; margin-bottom: .75rem; }
+    .cta-section p { color: var(--text-dim); max-width: 420px; margin: 0 auto 2rem; }
+    .cta-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+    .cta-actions .btn { padding: .7rem 1.6rem; font-size: 14.5px; }
+
+    /* ─── Footer ──────────────────────────────────────────────── */
+    footer {
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-left { font-size: 13px; color: var(--text-faint); }
+    .footer-links { display: flex; gap: 1.25rem; }
+    .footer-links a { font-size: 13px; color: var(--text-faint); }
+    .footer-links a:hover { color: var(--text-dim); text-decoration: none; }
+
+    /* ─── Divider ─────────────────────────────────────────────── */
+    .divider { max-width: 900px; margin: 0 auto; border: none; border-top: 1px solid var(--border); }
+
+    /* ─── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links a:not(.btn) { display: none; }
+      section { padding: 3rem 1rem; }
+      .hero { padding: 3.5rem 1rem 3rem; }
+      .stats { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Nav ──────────────────────────────────────────────── -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blurple)">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    Discord for AI Agents
+  </a>
+  <div class="nav-links">
+    <a href="#onboarding">Get started</a>
+    <a href="#templates">Templates</a>
+    <a href="#capabilities">Tools</a>
+    <a class="btn btn-ghost" href="https://github.com/dnzengou/discord-for-ai-agents" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- ─── Hero ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="badge">
+    <span class="dot"></span>
+    Claude Code Plugin · Apache 2.0 · Free
+  </div>
+  <h1>Run your Discord server<br>by talking to <em>Claude</em>.</h1>
+  <p>Describe what you want and Claude builds it — a whole server, a channel, a role, a welcome screen, an AutoMod rule. No menus, no dashboards, no clicking.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="#onboarding">Get started — 2 min</a>
+    <a class="btn btn-ghost" href="https://github.com/dnzengou/discord-for-ai-agents" target="_blank" rel="noopener">View on GitHub</a>
+    <a class="btn btn-ghost" href="https://discord.gg/babcVNJBet" target="_blank" rel="noopener">Join the community</a>
+  </div>
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-value">54</div>
+      <div class="stat-label">Discord tools</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">6</div>
+      <div class="stat-label">Server templates</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">&lt;2m</div>
+      <div class="stat-label">To first action</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">Free</div>
+      <div class="stat-label">Your own bot</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Onboarding ────────────────────────────────────────── -->
+<section class="onboarding-section" id="onboarding">
+  <div class="container">
+    <div class="section-label">Quick start</div>
+    <h2 class="section-title">From zero to first Discord change in 2 minutes</h2>
+    <p class="section-sub">Three steps. No config files, no YAML, no clicking through dashboards. The setup wizard handles everything in chat.</p>
+
+    <div class="steps" id="steps">
+
+      <!-- Step 1 -->
+      <div class="step active" id="step1">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Install the plugin inside Claude Code</div>
+          <div class="step-desc">Run these two commands. Then fully quit and reopen Claude Code — the plugin loads on restart.</div>
+          <div class="code-block" style="max-width:540px">
+            <div class="code-header">
+              <span>Claude Code terminal</span>
+              <button class="copy-btn" onclick="copyCode(this, '/plugin marketplace add JCodesMore/jcodesmore-plugins\n/plugin install discord@jcodesmore-plugins')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+            <div class="code-body">
+              <span class="cmd">/plugin marketplace add</span> <span class="arg">JCodesMore/jcodesmore-plugins</span><br>
+              <span class="cmd">/plugin install</span> <span class="arg">discord@jcodesmore-plugins</span>
+            </div>
+          </div>
+          <div class="sub-steps" style="margin-top:1rem">
+            <div class="sub-step"><span class="n">→</span><span>No Claude Code yet? <a href="https://claude.ai/download" target="_blank" rel="noopener">claude.ai/download</a> — free to install.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" id="step2">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Connect your Discord bot — one command, wizard does the rest</div>
+          <div class="step-desc">Claude walks you through creating a bot or using one you already own. Takes about 60 seconds.</div>
+          <div class="code-block" style="max-width:280px">
+            <div class="code-header">
+              <span>Claude Code chat</span>
+              <button class="copy-btn" onclick="copyCode(this, '/discord:setup')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+            <div class="code-body">
+              <span class="cmd">/discord:setup</span>
+            </div>
+          </div>
+          <div class="sub-steps" style="margin-top:1rem">
+            <div class="sub-step"><span class="n">1.</span><span>Claude opens <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">discord.com/developers/applications</a> → New Application</span></div>
+            <div class="sub-step"><span class="n">2.</span><span>Bot tab → Reset Token → Copy → paste into chat</span></div>
+            <div class="sub-step"><span class="n">3.</span><span>Claude verifies the token, generates an invite URL, adds bot to your server</span></div>
+            <div class="sub-step"><span class="n">4.</span><span>Pick which server to manage → done ✓</span></div>
+          </div>
+          <div class="sub-steps" style="margin-top:.75rem">
+            <div class="sub-step"><span class="n">→</span><span style="color:var(--text-faint)">Already have a bot token? Paste it at step 2. The wizard skips what's already configured.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" id="step3">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Describe what you want — and it's done</div>
+          <div class="step-desc">Type <code style="font-family:var(--mono);font-size:12.5px;background:var(--bg);border:1px solid var(--border);padding:.1rem .35rem;border-radius:4px">/discord</code> then describe anything. Click any example below to copy it.</div>
+          <div class="prompt-list" style="max-width:580px">
+            <div class="prompt" onclick="copyCode(null, '/discord make me a server for my AI research community', this)">
+              <span class="prompt-text"><span style="color:var(--blurple)">/discord</span> make me a server for my AI research community</span>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this, '/discord make me a server for my AI research community')">Copy</button>
+            </div>
+            <div class="prompt" onclick="copyCode(null, '/discord create a #announcements channel under an Info category', this)">
+              <span class="prompt-text"><span style="color:var(--blurple)">/discord</span> create a #announcements channel under an Info category</span>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this, '/discord create a #announcements channel under an Info category')">Copy</button>
+            </div>
+            <div class="prompt" onclick="copyCode(null, '/discord add a Moderator role — blurple, hoisted, with kick and ban perms', this)">
+              <span class="prompt-text"><span style="color:var(--blurple)">/discord</span> add a Moderator role — blurple, hoisted, with kick and ban perms</span>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this, '/discord add a Moderator role — blurple, hoisted, with kick and ban perms')">Copy</button>
+            </div>
+            <div class="prompt" onclick="copyCode(null, '/discord apply the startup-team template to my server', this)">
+              <span class="prompt-text"><span style="color:var(--blurple)">/discord</span> apply the startup-team template to my server</span>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this, '/discord apply the startup-team template to my server')">Copy</button>
+            </div>
+            <div class="prompt" onclick="copyCode(null, '/discord block profanity and mention-spam in all channels', this)">
+              <span class="prompt-text"><span style="color:var(--blurple)">/discord</span> block profanity and mention-spam in all channels</span>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyCode(this, '/discord block profanity and mention-spam in all channels')">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /steps -->
+  </div>
+</section>
+
+<!-- ─── Why ───────────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-label">Why it works</div>
+    <h2 class="section-title">Designed around the way you actually think</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-icon">⚡</span>
+        <div class="why-title">No Discord UI required</div>
+        <div class="why-body">Every setting Discord exposes via REST is accessible through natural language. Channels, roles, permissions, AutoMod, welcome screens — all in chat.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🏗</span>
+        <div class="why-title">Architect agent for full servers</div>
+        <div class="why-body">Open-ended requests spawn a dedicated architect agent. Describe a community type, get a full structure: roles, categories, channels, AutoMod, welcome screen — applied atomically.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔒</span>
+        <div class="why-title">Your bot, your token</div>
+        <div class="why-body">Nothing talks to a third-party server. Your bot token lives in Claude Code's local plugin data directory on your machine. Plaintext — scoped to your machine only.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔄</span>
+        <div class="why-title">Safe by default</div>
+        <div class="why-body">Template applications are idempotent — existing channels/roles are skipped by name. The architect agent dry-runs and previews before applying. Destructive actions require explicit intent.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">⚙️</span>
+        <div class="why-title">30s TTL cache</div>
+        <div class="why-body">Channels and roles are cached within each session. Multi-step flows — "list → resolve ID → create" — hit the API once, not five times. Cache invalidates automatically on mutations.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🛡</span>
+        <div class="why-title">Rate-limit safe</div>
+        <div class="why-body">Built on @discordjs/rest, which handles Discord's bucket-based rate limits with automatic retry and 429 back-off. No handmade retry logic needed.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── Templates ─────────────────────────────────────────── -->
+<section id="templates">
+  <div class="container">
+    <div class="section-label">Server templates</div>
+    <h2 class="section-title">6 ready-made servers, one command each</h2>
+    <p class="section-sub">Each template builds roles → categories → channels → AutoMod → welcome screen in a single atomic operation. Re-apply at any time — existing entities are skipped.</p>
+    <div class="templates-grid">
+
+      <div class="template-card" style="--accent:#57F287">
+        <span class="template-icon">🤖</span>
+        <div class="template-name">AI Community <span style="font-size:11px;color:var(--blurple);font-weight:600;margin-left:.35rem">NEW</span></div>
+        <div class="template-desc">LLM/ML builders, researchers, and enthusiasts — model releases, project showcases, tool discussions.</div>
+        <div class="template-meta">
+          <span class="chip">3 roles</span><span class="chip">6 categories</span><span class="chip">17 channels</span><span class="chip">AutoMod</span>
+        </div>
+        <code class="template-cmd">/discord apply the ai-community template</code>
+      </div>
+
+      <div class="template-card" style="--accent:#5865F2">
+        <span class="template-icon">🚀</span>
+        <div class="template-name">Startup Team <span style="font-size:11px;color:var(--blurple);font-weight:600;margin-left:.35rem">NEW</span></div>
+        <div class="template-desc">Internal async workspace by function — eng, design, growth, ops. No noise, async-first.</div>
+        <div class="template-meta">
+          <span class="chip">4 roles</span><span class="chip">7 categories</span><span class="chip">20 channels</span><span class="chip">AutoMod</span>
+        </div>
+        <code class="template-cmd">/discord apply the startup-team template</code>
+      </div>
+
+      <div class="template-card" style="--accent:#FEE75C">
+        <span class="template-icon">🎮</span>
+        <div class="template-name">Gaming Community</div>
+        <div class="template-desc">Squads, LFG, tournament brackets, game-specific channels, and moderation structure.</div>
+        <div class="template-meta">
+          <span class="chip">roles</span><span class="chip">categories</span><span class="chip">channels</span>
+        </div>
+        <code class="template-cmd">/discord apply the gaming-community template</code>
+      </div>
+
+      <div class="template-card" style="--accent:#EB459E">
+        <span class="template-icon">💻</span>
+        <div class="template-name">Dev Community</div>
+        <div class="template-desc">OSS projects and coding communities — code review, language channels, a showcase forum.</div>
+        <div class="template-meta">
+          <span class="chip">roles</span><span class="chip">categories</span><span class="chip">channels</span>
+        </div>
+        <code class="template-cmd">/discord apply the dev-community template</code>
+      </div>
+
+      <div class="template-card" style="--accent:#ED4245">
+        <span class="template-icon">🎙</span>
+        <div class="template-name">Content Creator</div>
+        <div class="template-desc">Streamers and YouTubers — fan tiers, subscriber roles, clip sharing, stream schedule.</div>
+        <div class="template-meta">
+          <span class="chip">roles</span><span class="chip">categories</span><span class="chip">channels</span>
+        </div>
+        <code class="template-cmd">/discord apply the content-creator template</code>
+      </div>
+
+      <div class="template-card" style="--accent:#57F287">
+        <span class="template-icon">📚</span>
+        <div class="template-name">Study Group</div>
+        <div class="template-desc">Study pods, subject channels, tutoring help, homework check-ins, and focus voice rooms.</div>
+        <div class="template-meta">
+          <span class="chip">roles</span><span class="chip">categories</span><span class="chip">channels</span>
+        </div>
+        <code class="template-cmd">/discord apply the study-group template</code>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ─── Capabilities ──────────────────────────────────────── -->
+<section id="capabilities">
+  <div class="container">
+    <div class="section-label">Tools</div>
+    <h2 class="section-title">54 tools across every Discord primitive</h2>
+    <p class="section-sub">Full REST coverage — everything from bulk operations to a raw escape hatch for any endpoint not explicitly wrapped.</p>
+    <div class="caps-grid">
+
+      <div class="cap-card">
+        <div class="cap-title">🏛 Guild <span class="cap-count">3 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_get_guild</div>
+          <div class="cap-item">discord_modify_guild_settings</div>
+          <div class="cap-item" style="color:var(--blurple)">discord_server_snapshot ✦</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">📐 Channels <span class="cap-count">6 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_list_channels</div>
+          <div class="cap-item">discord_create_channel</div>
+          <div class="cap-item">discord_modify_channel</div>
+          <div class="cap-item">discord_delete_channel</div>
+          <div class="cap-item">discord_modify_channel_positions</div>
+          <div class="cap-item">discord_set_channel_permission_overwrite</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">🎭 Roles <span class="cap-count">7 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_list_roles</div>
+          <div class="cap-item">discord_create_role</div>
+          <div class="cap-item">discord_modify_role</div>
+          <div class="cap-item">discord_delete_role</div>
+          <div class="cap-item">discord_modify_role_positions</div>
+          <div class="cap-item">discord_assign_role</div>
+          <div class="cap-item">discord_remove_role</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">💬 Messages <span class="cap-count">7 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_send_message</div>
+          <div class="cap-item">discord_send_embed</div>
+          <div class="cap-item">discord_edit_message</div>
+          <div class="cap-item">discord_delete_message</div>
+          <div class="cap-item" style="color:var(--blurple)">discord_bulk_delete_messages ✦</div>
+          <div class="cap-item">discord_add_reaction</div>
+          <div class="cap-item">discord_pin_message</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">🛡 AutoMod <span class="cap-count">4 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_list_automod_rules</div>
+          <div class="cap-item">discord_create_automod_rule</div>
+          <div class="cap-item">discord_modify_automod_rule</div>
+          <div class="cap-item">discord_delete_automod_rule</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">👥 Members <span class="cap-count">6 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_list_members</div>
+          <div class="cap-item">discord_get_member</div>
+          <div class="cap-item">discord_modify_member</div>
+          <div class="cap-item">discord_kick_member</div>
+          <div class="cap-item">discord_ban_member</div>
+          <div class="cap-item">discord_unban_member</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">🔗 Webhooks <span class="cap-count">4 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_list_webhooks</div>
+          <div class="cap-item">discord_create_webhook</div>
+          <div class="cap-item">discord_send_via_webhook</div>
+          <div class="cap-item">discord_delete_webhook</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">📅 Events <span class="cap-count">4 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_create_scheduled_event</div>
+          <div class="cap-item">discord_list_scheduled_events</div>
+          <div class="cap-item">discord_modify_scheduled_event</div>
+          <div class="cap-item">discord_delete_scheduled_event</div>
+        </div>
+      </div>
+
+      <div class="cap-card">
+        <div class="cap-title">🚪 Onboarding <span class="cap-count">4 tools</span></div>
+        <div class="cap-items">
+          <div class="cap-item">discord_get_welcome_screen</div>
+          <div class="cap-item">discord_modify_welcome_screen</div>
+          <div class="cap-item">discord_get_guild_onboarding</div>
+          <div class="cap-item">discord_modify_guild_onboarding</div>
+        </div>
+      </div>
+
+    </div>
+    <p style="margin-top:1.25rem;font-size:13px;color:var(--text-faint)">✦ New in production build &nbsp;·&nbsp; Plus auth/state tools and <code style="font-family:var(--mono)">discord_raw_request</code> escape hatch</p>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────────── -->
+<div class="cta-section">
+  <div class="container">
+    <h2>Your first Discord change in under 2 minutes</h2>
+    <p>Free. No third-party access to your server. Runs entirely from Claude Code on your machine.</p>
+    <div class="cta-actions">
+      <a class="btn btn-primary" href="#onboarding">Get started</a>
+      <a class="btn btn-ghost" href="https://github.com/dnzengou/discord-for-ai-agents" target="_blank" rel="noopener">View source</a>
+      <a class="btn btn-ghost" href="https://discord.gg/babcVNJBet" target="_blank" rel="noopener">Join Discord</a>
+    </div>
+    <p style="margin-top:2rem;font-size:12.5px;color:var(--text-faint)">
+      Not affiliated with or endorsed by Discord Inc.
+    </p>
+  </div>
+</div>
+
+<!-- ─── Footer ────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-left">Discord for AI Agents &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; © 2026 JCodesMore</div>
+  <div class="footer-links">
+    <a href="https://github.com/dnzengou/discord-for-ai-agents" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://discord.gg/babcVNJBet" target="_blank" rel="noopener">Discord</a>
+    <a href="BLUEPRINT.md" target="_blank">Blueprint</a>
+    <a href="https://github.com/dnzengou/discord-for-ai-agents/issues" target="_blank" rel="noopener">Issues</a>
+  </div>
+</footer>
+
+<!-- ─── JS ────────────────────────────────────────────────── -->
+<script>
+  /* Copy-to-clipboard */
+  function copyCode(btn, text, row) {
+    navigator.clipboard.writeText(text).then(() => {
+      const target = btn;
+      if (!target) return;
+      const prev = target.textContent;
+      target.textContent = 'Copied!';
+      target.classList.add('copied');
+      setTimeout(() => {
+        target.textContent = prev;
+        target.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  /* Step progress — mark steps done/active as user scrolls */
+  (function () {
+    const steps = document.querySelectorAll('.step');
+    if (!steps.length) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          // Mark all previous steps done
+          const idx = Array.from(steps).indexOf(e.target);
+          steps.forEach((s, i) => {
+            s.classList.remove('active', 'done');
+            if (i < idx) s.classList.add('done');
+            else if (i === idx) s.classList.add('active');
+          });
+        }
+      });
+    }, { threshold: 0.4 });
+    steps.forEach(s => observer.observe(s));
+  })();
+</script>
+
+</body>
+</html>

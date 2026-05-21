@@ -1,6 +1,8 @@
 # Discord for AI Agents — Production Blueprint
 
 > Updated 2026-05-21. Karpathy-style: every line earns its place.
+>
+> **Landing page:** deployed to Vercel/Netlify from `web/index.html`. Config: `vercel.json` + `netlify.toml`.
 
 ---
 
@@ -170,6 +172,7 @@ Channels and roles are fetched repeatedly during multi-step flows (list → reso
 - `discord_list_channels` — cached per guild
 - `discord_list_roles` — cached per guild
 - Invalidated automatically on any create/modify/delete of that entity type
+- **Periodic sweep:** expired entries are evicted every 5 minutes (not just on-read) — prevents unbounded growth in multi-guild deployments. `setInterval(...).unref()` keeps the Node process from staying alive just for the timer.
 
 ### Parallel fetch (discord_server_snapshot)
 Single tool that resolves guild + channels + roles in three simultaneous API calls. Use at the start of architect flows instead of three sequential calls.
@@ -298,6 +301,10 @@ discord-for-ai-agents-main/
 ├── .claude-plugin/
 │   └── plugin.json         # Plugin manifest, MCP config, hooks
 ├── dist/                   # Compiled output (gitignored)
+├── web/
+│   └── index.html          # Landing page (static, no build step)
+├── vercel.json             # Vercel deployment config
+├── netlify.toml            # Netlify deployment config
 ├── QUICKSTART.md           # New-user onboarding guide (see Onboarding section)
 ├── BLUEPRINT.md            # This file
 └── package.json
@@ -353,6 +360,69 @@ npm run build
 ```
 
 **Requirements:** Node.js ≥ 18. Bot token from discord.com/developers/applications.
+
+---
+
+## Web deployment (landing page)
+
+`web/index.html` — self-contained static landing page (no build step). Deploy to Vercel or Netlify by pointing to the repo root; each platform reads its respective config file.
+
+### Vercel (recommended)
+
+```bash
+# Option 1 — Vercel CLI
+npx vercel --prod
+
+# Option 2 — GitHub integration
+# 1. Push repo to GitHub
+# 2. vercel.com/new → Import → pick the repo → Deploy
+# No build command needed (static site, outputDirectory = "web")
+```
+
+Config: `vercel.json` at repo root — sets `outputDirectory: "web"`, `cleanUrls: true`, security headers, and long-cache headers for static assets.
+
+### Netlify
+
+```bash
+# Option 1 — Netlify CLI
+npx netlify deploy --prod --dir web
+
+# Option 2 — Drag-and-drop
+# netlify.com/drop → drag the web/ folder
+```
+
+Config: `netlify.toml` — sets `publish = "web"`, security headers, and redirect aliases (`/quickstart` → `/#onboarding`, `/docs` → `/#capabilities`).
+
+### Landing page structure
+
+| Section | Purpose |
+|---------|---------|
+| Hero | Value prop + stats (54 tools, 6 templates, <2 min) + CTAs |
+| Onboarding | Interactive 3-step wizard with copy buttons + step tracker |
+| Why | 6 "why it works" cards (cache, rate limits, architect agent, safety) |
+| Templates | 6 template cards with apply commands |
+| Capabilities | 54 tools organized by category |
+| CTA | Final conversion + trust signal |
+
+**UX design principles applied** (inspired by Linear, Vercel, Stripe):
+- Single conversion path — one command per step, no branching until after first win
+- Copy buttons on every code snippet — zero friction to paste into Claude Code
+- Scroll-driven step progress — steps mark themselves done as the user reads down
+- Immediate value framing — "54 tools, <2 min" in the hero before any instructions
+- Trust signal — token storage explained plainly in the onboarding section
+
+---
+
+## Code quality pass (2026-05-21)
+
+Simplify pass applied to the production build. Net result: −47 lines.
+
+| File | Change |
+|------|--------|
+| `src/cache.ts` | Added 5-min periodic sweep — expired entries evicted proactively, not just on-read. `.unref()` keeps Node from staying alive for the timer. |
+| `src/tools/channels.ts` | Collapsed duplicate cache hit/miss return blocks into one path. Replaced `try { invalidate(getActiveGuildId()) } catch {}` with `loadState().active_guild_id` conditional. Renamed `guildId2` artifact. Exported `formatChannel` + `TYPE_TO_FRIENDLY`. |
+| `src/tools/roles.ts` | Same cache block collapse. Exported `formatRole`. |
+| `src/tools/guild.ts` | Removed inline `CHANNEL_TYPE_FRIENDLY` (duplicated `TYPE_TO_FRIENDLY`) and per-call `PERM_BIT_TO_SNAKE` reconstruction + dynamic `await import`. `discord_server_snapshot` now calls `formatChannel` + `formatRole` — consistent output, zero extra per-call allocations. |
 
 ---
 
