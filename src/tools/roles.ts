@@ -107,7 +107,7 @@ function colorIntToHex(c: number): string | null {
   return '#' + c.toString(16).padStart(6, '0').toUpperCase();
 }
 
-function formatRole(r: APIRole): Record<string, unknown> {
+export function formatRole(r: APIRole): Record<string, unknown> {
   const out: Record<string, unknown> = {
     id: r.id,
     name: r.name,
@@ -143,35 +143,21 @@ export function registerRoleTools(server: McpServer): void {
       if (guard) return guard;
       const guildId = getActiveGuildId();
       const cacheKey = `roles:${guildId}`;
-      const cached = getCached<APIRole[]>(cacheKey);
-      if (cached) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ count: cached.length, roles: cached.map(formatRole) }, null, 2),
-            },
-          ],
-        };
+      let roles = getCached<APIRole[]>(cacheKey);
+      if (!roles) {
+        try {
+          roles = (await getRest().get(Routes.guildRoles(guildId))) as APIRole[];
+          setCached(cacheKey, roles);
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text' as const, text: formatDiscordError(err) }] };
+        }
       }
-      try {
-        const rest = getRest();
-        const roles = (await rest.get(Routes.guildRoles(guildId))) as APIRole[];
-        setCached(cacheKey, roles);
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ count: roles.length, roles: roles.map(formatRole) }, null, 2),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          isError: true,
-          content: [{ type: 'text' as const, text: formatDiscordError(err) }],
-        };
-      }
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({ count: roles.length, roles: roles.map(formatRole) }, null, 2),
+        }],
+      };
     },
   );
 

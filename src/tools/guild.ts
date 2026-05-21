@@ -3,9 +3,10 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { Routes } from 'discord-api-types/v10';
 import type { APIChannel, APIGuild, APIRole } from 'discord-api-types/v10';
 import { formatDiscordError, getRest } from '../client.js';
-import { getActiveGuildId } from '../state.js';
+import { getActiveGuildId, patchState } from '../state.js';
 import { activeGuildGuard, tokenGuard } from '../guards.js';
-import { patchState } from '../state.js';
+import { formatChannel } from './channels.js';
+import { formatRole } from './roles.js';
 
 const READ_ONLY = {
   readOnlyHint: true,
@@ -241,46 +242,14 @@ export function registerGuildTools(server: McpServer): void {
       }
 
       if (channelsResult.status === 'fulfilled') {
-        const CHANNEL_TYPE_FRIENDLY: Record<number, string> = {
-          0: 'text', 1: 'dm', 2: 'voice', 3: 'group_dm', 4: 'category',
-          5: 'announcement', 10: 'announcement_thread', 11: 'public_thread',
-          12: 'private_thread', 13: 'stage', 14: 'directory', 15: 'forum', 16: 'media',
-        };
-        out.channels = channelsResult.value.map((c) => {
-          const a = c as unknown as Record<string, unknown>;
-          return {
-            id: a.id, name: a.name ?? null,
-            type: CHANNEL_TYPE_FRIENDLY[c.type] ?? `unknown(${c.type})`,
-            parent_id: a.parent_id ?? null, position: a.position ?? null,
-            topic: a.topic ?? null,
-          };
-        });
+        out.channels = channelsResult.value.map(formatChannel);
         out.channel_count = channelsResult.value.length;
       } else {
         out.channels_error = formatDiscordError(channelsResult.reason);
       }
 
       if (rolesResult.status === 'fulfilled') {
-        const PERM_BIT_TO_SNAKE: Array<[bigint, string]> = [];
-        const { PermissionFlagsBits } = await import('discord-api-types/v10');
-        const seen = new Set<bigint>();
-        for (const [pascal, bit] of Object.entries(PermissionFlagsBits)) {
-          const b = bit as bigint;
-          if (!seen.has(b)) {
-            seen.add(b);
-            PERM_BIT_TO_SNAKE.push([b, pascal.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase()]);
-          }
-        }
-        out.roles = rolesResult.value.map((r) => {
-          const bits = BigInt(r.permissions);
-          const perm_names = PERM_BIT_TO_SNAKE.filter(([bit]) => (bits & bit) === bit).map(([, name]) => name);
-          return {
-            id: r.id, name: r.name,
-            color: r.color ? '#' + r.color.toString(16).padStart(6, '0').toUpperCase() : null,
-            hoist: r.hoist, position: r.position, mentionable: r.mentionable,
-            managed: r.managed, perm_names,
-          };
-        });
+        out.roles = rolesResult.value.map(formatRole);
         out.role_count = rolesResult.value.length;
       } else {
         out.roles_error = formatDiscordError(rolesResult.reason);

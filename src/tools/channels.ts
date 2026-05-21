@@ -3,7 +3,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ChannelType, Routes } from 'discord-api-types/v10';
 import type { APIChannel } from 'discord-api-types/v10';
 import { formatDiscordError, getRest } from '../client.js';
-import { getActiveGuildId } from '../state.js';
+import { getActiveGuildId, loadState } from '../state.js';
 import { activeGuildGuard, tokenGuard } from '../guards.js';
 import { getCached, setCached, invalidate } from '../cache.js';
 
@@ -37,7 +37,7 @@ const FRIENDLY_TO_TYPE = {
 
 type FriendlyChannelType = keyof typeof FRIENDLY_TO_TYPE;
 
-const TYPE_TO_FRIENDLY: Record<number, string> = {
+export const TYPE_TO_FRIENDLY: Record<number, string> = {
   [ChannelType.GuildText]: 'text',
   [ChannelType.DM]: 'dm',
   [ChannelType.GuildVoice]: 'voice',
@@ -53,7 +53,7 @@ const TYPE_TO_FRIENDLY: Record<number, string> = {
   [ChannelType.GuildMedia]: 'media',
 };
 
-function formatChannel(c: APIChannel): Record<string, unknown> {
+export function formatChannel(c: APIChannel): Record<string, unknown> {
   const any = c as unknown as Record<string, unknown>;
   const out: Record<string, unknown> = {
     id: any.id,
@@ -85,35 +85,21 @@ export function registerChannelTools(server: McpServer): void {
       if (guard) return guard;
       const guildId = getActiveGuildId();
       const cacheKey = `channels:${guildId}`;
-      const cached = getCached<APIChannel[]>(cacheKey);
-      if (cached) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ count: cached.length, channels: cached.map(formatChannel) }, null, 2),
-            },
-          ],
-        };
+      let channels = getCached<APIChannel[]>(cacheKey);
+      if (!channels) {
+        try {
+          channels = (await getRest().get(Routes.guildChannels(guildId))) as APIChannel[];
+          setCached(cacheKey, channels);
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text' as const, text: formatDiscordError(err) }] };
+        }
       }
-      try {
-        const rest = getRest();
-        const channels = (await rest.get(Routes.guildChannels(guildId))) as APIChannel[];
-        setCached(cacheKey, channels);
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ count: channels.length, channels: channels.map(formatChannel) }, null, 2),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          isError: true,
-          content: [{ type: 'text' as const, text: formatDiscordError(err) }],
-        };
-      }
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({ count: channels.length, channels: channels.map(formatChannel) }, null, 2),
+        }],
+      };
     },
   );
 
@@ -257,7 +243,8 @@ export function registerChannelTools(server: McpServer): void {
         }
         if (type) body.type = FRIENDLY_TO_TYPE[type as FriendlyChannelType];
         const channel = (await rest.patch(Routes.channel(channel_id), { body, reason })) as APIChannel;
-        try { invalidate(`channels:${getActiveGuildId()}`); } catch { /* no active guild in scope */ }
+        const gId = loadState().active_guild_id;
+        if (gId) invalidate(`channels:${gId}`);
         return {
           content: [
             {
@@ -292,7 +279,8 @@ export function registerChannelTools(server: McpServer): void {
       try {
         const rest = getRest();
         const channel = (await rest.delete(Routes.channel(channel_id), { reason })) as APIChannel;
-        try { invalidate(`channels:${getActiveGuildId()}`); } catch { /* no active guild in scope */ }
+        const gId = loadState().active_guild_id;
+        if (gId) invalidate(`channels:${gId}`);
         return {
           content: [
             {
@@ -343,12 +331,12 @@ export function registerChannelTools(server: McpServer): void {
       if (guard) return guard;
       try {
         const rest = getRest();
-        const guildId2 = getActiveGuildId();
-        await rest.patch(Routes.guildChannels(guildId2), {
+        const guildId = getActiveGuildId();
+        await rest.patch(Routes.guildChannels(guildId), {
           body: positions,
           reason,
         });
-        invalidate(`channels:${guildId2}`);
+        invalidate(`channels:${guildId}`);
         return {
           content: [
             {

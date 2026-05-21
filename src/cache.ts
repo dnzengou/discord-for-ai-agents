@@ -1,5 +1,15 @@
 const store = new Map<string, { value: unknown; expiresAt: number }>();
 
+// Evict expired entries every 5 minutes so the store doesn't grow unbounded
+// in long-running multi-guild deployments. unref() keeps Node from staying
+// alive just for this timer.
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of store) {
+    if (now > entry.expiresAt) store.delete(key);
+  }
+}, 5 * 60_000).unref();
+
 export function getCached<T>(key: string): T | undefined {
   const entry = store.get(key);
   if (!entry) return undefined;
