@@ -1,0 +1,269 @@
+{
+  "name": "Clow Ecosystem",
+  "description": "deeptechx community server for PicoClaw and OpenClaw AI bots — researchers, developers, and builders.",
+  "guild": {
+    "verification_level": "low",
+    "default_message_notifications": "only_mentions",
+    "explicit_content_filter": "members_without_roles"
+  },
+  "roles": [
+    {
+      "name": "Admin",
+      "color": "#ED4245",
+      "permissions": ["administrator"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Bot Manager",
+      "color": "#5865F2",
+      "permissions": [
+        "kick_members", "ban_members", "manage_channels",
+        "manage_roles", "manage_messages", "moderate_members",
+        "manage_threads", "view_audit_log"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Researcher",
+      "color": "#57F287",
+      "permissions": [
+        "send_messages", "embed_links", "attach_files",
+        "add_reactions", "use_slash_commands", "manage_threads",
+        "read_message_history"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Developer",
+      "color": "#FEE75C",
+      "permissions": [
+        "send_messages", "embed_links", "attach_files",
+        "add_reactions", "use_slash_commands", "manage_threads",
+        "read_message_history"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Contributor",
+      "color": "#EB459E",
+      "permissions": [
+        "send_messages", "embed_links", "attach_files",
+        "add_reactions", "use_slash_commands", "read_message_history"
+      ],
+      "hoist": true,
+      "mentionable": false
+    },
+    {
+      "name": "Observer",
+      "color": "#99AAB5",
+      "permissions": [
+        "view_channel", "read_message_history", "use_slash_commands"
+      ],
+      "hoist": false,
+      "mentionable": false
+    }
+  ],
+  "categories": [
+    { "name": "INFORMATION" },
+    { "name": "CLAW BOTS" },
+    { "name": "RESEARCH" },
+    { "name": "DEVELOPMENT" },
+    { "name": "DEPLOYMENTS" },
+    { "name": "COMMUNITY" },
+    { "name": "VOICE" }
+  ],
+  "channels": [
+    {
+      "name": "welcome",
+      "type": "text",
+      "category": "INFORMATION",
+      "topic": "First stop. Read the rules and introduce yourself."
+    },
+    {
+      "name": "rules",
+      "type": "text",
+      "category": "INFORMATION",
+      "topic": "Community guidelines and code of conduct."
+    },
+    {
+      "name": "announcements",
+      "type": "announcement",
+      "category": "INFORMATION",
+      "topic": "Official updates from the team. Follow to crosspost."
+    },
+    {
+      "name": "bot-updates",
+      "type": "announcement",
+      "category": "INFORMATION",
+      "topic": "PicoClaw and OpenClaw changelogs and uptime status."
+    },
+    {
+      "name": "roadmap",
+      "type": "text",
+      "category": "INFORMATION",
+      "topic": "What's being built. What's next. Vote with reactions."
+    },
+    {
+      "name": "picoclaw",
+      "type": "text",
+      "category": "CLAW BOTS",
+      "topic": "PicoClaw — private dev assistant. /ask /code /debug /review /devflow /status"
+    },
+    {
+      "name": "openclaw",
+      "type": "text",
+      "category": "CLAW BOTS",
+      "topic": "OpenClaw — community AI assistant. /chat /research /compare /learn /help"
+    },
+    {
+      "name": "bot-feedback",
+      "type": "forum",
+      "category": "CLAW BOTS",
+      "topic": "Report issues, suggest commands, share prompts that worked well."
+    },
+    {
+      "name": "bot-status",
+      "type": "text",
+      "category": "CLAW BOTS",
+      "topic": "Automated uptime and health alerts. Read-only."
+    },
+    {
+      "name": "playground",
+      "type": "text",
+      "category": "CLAW BOTS",
+      "topic": "Test commands, experiment freely, no judgment."
+    },
+    {
+      "name": "papers",
+      "type": "text",
+      "category": "RESEARCH",
+      "topic": "Arxiv drops, preprints, and paper discussions. Include a one-liner summary."
+    },
+    {
+      "name": "experiments",
+      "type": "forum",
+      "category": "RESEARCH",
+      "topic": "Share results and ablations. Include: method · metric · result · code link."
+    },
+    {
+      "name": "benchmarks",
+      "type": "text",
+      "category": "RESEARCH",
+      "topic": "Model performance comparisons. Use /benchmark for data."
+    },
+    {
+      "name": "model-releases",
+      "type": "text",
+      "category": "RESEARCH",
+      "topic": "New model releases, fine-tunes, quantizations."
+    },
+    {
+      "name": "general-dev",
+      "type": "text",
+      "category": "DEVELOPMENT",
+      "topic": "Engineering chat, questions, random code things."
+    },
+    {
+      "name": "code-review",
+      "type": "forum",
+      "category": "DEVELOPMENT",
+      "topic": "Drop PR links. Ask for specific feedback. Tag reviewers."
+    },
+    {
+      "name": "help",
+      "type": "forum",
+      "category": "DEVELOPMENT",
+      "topic": "Stuck? Include: what you tried · error message · stack + versions."
+    },
+    {
+      "name": "showcase",
+      "type": "forum",
+      "category": "DEVELOPMENT",
+      "topic": "Ship something? Demo it here. Ship early, ship often."
+    },
+    {
+      "name": "deploys",
+      "type": "text",
+      "category": "DEPLOYMENTS",
+      "topic": "Automated deploy log. Every production change appears here."
+    },
+    {
+      "name": "incidents",
+      "type": "text",
+      "category": "DEPLOYMENTS",
+      "topic": "Active incidents and post-mortems. Ping @Bot Manager for urgent issues."
+    },
+    {
+      "name": "introductions",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "New here? Tell us who you are and what you're building."
+    },
+    {
+      "name": "general",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "Anything AI and tech. Hot takes welcome."
+    },
+    {
+      "name": "reads-and-links",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "Articles, threads, videos worth sharing. Include a one-line take."
+    },
+    {
+      "name": "Standup",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 20
+    },
+    {
+      "name": "Research Room",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 8
+    },
+    {
+      "name": "Dev Room",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 6
+    }
+  ],
+  "welcome_screen": {
+    "enabled": true,
+    "description": "AI builders, researchers, and developers — home of PicoClaw and OpenClaw.",
+    "channels": [
+      { "channel": "rules",          "description": "Start here",          "emoji_name": "📜" },
+      { "channel": "introductions",  "description": "Say hi",              "emoji_name": "👋" },
+      { "channel": "openclaw",       "description": "Try the AI assistant","emoji_name": "🤖" },
+      { "channel": "showcase",       "description": "Share your work",     "emoji_name": "🚀" }
+    ]
+  },
+  "automod_rules": [
+    {
+      "name": "Block slurs",
+      "trigger": "keyword_preset",
+      "presets": ["slurs"],
+      "block_message": "Please keep it respectful. This content isn't allowed here."
+    },
+    {
+      "name": "Block invite spam",
+      "trigger": "keyword",
+      "keyword_filter": ["discord.gg/", "discord.com/invite/", "discordapp.com/invite/"],
+      "block_message": "Server invites need mod approval. DM a moderator.",
+      "exempt_roles": ["Admin", "Bot Manager"]
+    },
+    {
+      "name": "Mention raid guard",
+      "trigger": "mention_spam",
+      "mention_total_limit": 6,
+      "mention_raid_protection_enabled": true,
+      "block_message": true
+    }
+  ]
+}

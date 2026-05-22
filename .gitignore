@@ -3,6 +3,8 @@ dist/
 *.tsbuildinfo
 .env
 .env.local
+.env.deploy
+deploy/.env.deploy
 *.log
 .DS_Store
 .vscode/

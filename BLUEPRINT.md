@@ -159,6 +159,7 @@ skills/setup/SKILL.md  skills/discord/SKILL.md
 | `content-creator` | Streamers, YouTubers, fan communities |
 | `ai-community` | **NEW** — LLM/ML builders, researchers |
 | `startup-team` | **NEW** — Internal async team workspace |
+| `clow-ecosystem` | **NEW** — deeptechx: PicoClaw + OpenClaw, 7 roles, 25 channels |
 
 Each template creates: roles → categories → channels → welcome screen → AutoMod rules, in order. Anything matching an existing entity by name is silently skipped — safe to re-apply.
 
@@ -301,6 +302,11 @@ discord-for-ai-agents-main/
 ├── .claude-plugin/
 │   └── plugin.json         # Plugin manifest, MCP config, hooks
 ├── dist/                   # Compiled output (gitignored)
+├── deploy/
+│   ├── deploy.sh           # Two-bot Fly.io deploy (--dry-run, --setup flags)
+│   ├── register_commands.sh# 24 slash commands via idempotent bulk PUT
+│   ├── setup_guide.sh      # Interactive wizard → .env.deploy (--check / --reset)
+│   └── DISCORD_SERVER_SETUP.md # 25-channel architecture + roles + AutoMod + checklists
 ├── web/
 │   └── index.html          # Landing page (static, no build step)
 ├── vercel.json             # Vercel deployment config
@@ -423,6 +429,59 @@ Simplify pass applied to the production build. Net result: −47 lines.
 | `src/tools/channels.ts` | Collapsed duplicate cache hit/miss return blocks into one path. Replaced `try { invalidate(getActiveGuildId()) } catch {}` with `loadState().active_guild_id` conditional. Renamed `guildId2` artifact. Exported `formatChannel` + `TYPE_TO_FRIENDLY`. |
 | `src/tools/roles.ts` | Same cache block collapse. Exported `formatRole`. |
 | `src/tools/guild.ts` | Removed inline `CHANNEL_TYPE_FRIENDLY` (duplicated `TYPE_TO_FRIENDLY`) and per-call `PERM_BIT_TO_SNAKE` reconstruction + dynamic `await import`. `discord_server_snapshot` now calls `formatChannel` + `formatRole` — consistent output, zero extra per-call allocations. |
+
+---
+
+## Clow Bots GTM Package (deploy/)
+
+Production-ready deployment package for the **PicoClaw** and **OpenClaw** Discord bot ecosystem on the **deeptechx** server.
+
+| File | Purpose |
+|------|---------|
+| `deploy/deploy.sh` | Idempotent two-bot deploy (Fly.io / flyctl or curl fallback). Validates env, calls register_commands.sh, sets Fly secrets, deploys. `--dry-run` flag. |
+| `deploy/register_commands.sh` | 24 slash commands via bulk PUT (12 per bot). Idempotent — safe to re-run. Guild-scoped (instant) when `GUILD_ID` is set, global otherwise. Rate-limit-aware retry loop. |
+| `deploy/setup_guide.sh` | Interactive wizard: reads bot tokens + app IDs + public keys, writes `.env.deploy` (chmod 600), adds to `.gitignore` automatically. `--check` / `--reset` modes. |
+| `deploy/DISCORD_SERVER_SETUP.md` | 7 categories · 25 channels · 7 roles · AutoMod · welcome + rules templates · permission overwrites · post-launch verification checklist. |
+| `templates/clow-ecosystem.json` | Full Discord template: 6 roles, 7 categories, 25 channels (including forum and announcement types), welcome screen, 3 AutoMod rules. Apply with `/discord apply the clow-ecosystem template`. |
+
+### Slash commands (24 total)
+
+**PicoClaw** (dev assistant — 12): `ask` `code` `explain` `debug` `review` `summarize` `improve` `test` `docs` `deploy` `devflow` `status`
+
+**OpenClaw** (community bot — 12): `help` `chat` `research` `compare` `benchmark` `model` `template` `analyze` `report` `feedback` `imagine` `learn`
+
+### RSS (Reinforce / Robustify / Solidify / Stabilize) guarantees applied
+
+| Script | Guarantee |
+|--------|-----------|
+| All `.sh` files | `set -euo pipefail` — abort on any error, unset variable, or pipe failure |
+| `deploy.sh` | Validates all required env vars before touching Discord or Fly.io |
+| `register_commands.sh` | PUT is idempotent — re-running never duplicates commands |
+| `register_commands.sh` | `429` rate-limit retry loop with `retry_after` from Discord response |
+| `setup_guide.sh` | Writes `.env.deploy` with `chmod 600` — no world-readable secrets |
+| `setup_guide.sh` | Auto-appends to `.gitignore` — `.env.deploy` can never be committed accidentally |
+| `deploy.sh` | Grepping for hardcoded tokens in tracked files before deploying |
+| `deploy.sh` | `--dry-run` flag — validate everything without side effects |
+| All templates | Idempotent: existing channels/roles skipped by name |
+
+### Deploy flow
+```bash
+# One-time setup
+bash deploy/setup_guide.sh
+
+# Register commands (guild-scoped = instant, global = up to 1h)
+BOT_TOKEN=$PICOCLAW_BOT_TOKEN APP_ID=$PICOCLAW_APP_ID GUILD_ID=$DISCORD_GUILD_ID \
+  bash deploy/register_commands.sh both
+
+# Apply server template (via discord-for-ai-agents plugin)
+/discord apply the clow-ecosystem template
+
+# Deploy bots
+bash deploy/deploy.sh
+
+# Verify
+bash deploy/setup_guide.sh --check
+```
 
 ---
 
