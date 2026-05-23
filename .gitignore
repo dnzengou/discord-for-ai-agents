@@ -12,3 +12,5 @@ deploy/.env.deploy
 temp/
 .claude/
 ${CLAUDE_PLUGIN_DATA}
+
+.vercel
