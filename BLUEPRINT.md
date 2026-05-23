@@ -149,7 +149,7 @@ skills/setup/SKILL.md  skills/discord/SKILL.md
 
 ---
 
-## Templates (6 bundled)
+## Templates (8 bundled)
 
 | Template | Best for |
 |----------|----------|
@@ -157,9 +157,10 @@ skills/setup/SKILL.md  skills/discord/SKILL.md
 | `study-group` | Study pods, tutoring, academic |
 | `dev-community` | OSS projects, programming communities |
 | `content-creator` | Streamers, YouTubers, fan communities |
-| `ai-community` | **NEW** — LLM/ML builders, researchers |
-| `startup-team` | **NEW** — Internal async team workspace |
-| `clow-ecosystem` | **NEW** — deeptechx: PicoClaw + OpenClaw, 7 roles, 25 channels |
+| `ai-community` | LLM/ML builders, researchers |
+| `startup-team` | Internal async team workspace |
+| `clow-ecosystem` | deeptechx: PicoClaw + OpenClaw, 7 roles, 25 channels |
+| `blockchain-enterprise-community` | **NEW** — blockchain builders, founders, legal professionals, enterprise practitioners. 7 roles, 8 categories, 35 channels, 4 AutoMod rules |
 
 Each template creates: roles → categories → channels → welcome screen → AutoMod rules, in order. Anything matching an existing entity by name is silently skipped — safe to re-apply.
 
@@ -293,8 +294,11 @@ discord-for-ai-agents-main/
 │   ├── study-group.json
 │   ├── dev-community.json
 │   ├── content-creator.json
-│   ├── ai-community.json   # NEW
-│   └── startup-team.json   # NEW
+│   ├── ai-community.json
+│   ├── startup-team.json
+│   ├── clow-ecosystem.json              # deeptechx · PicoClaw + OpenClaw
+│   └── blockchain-enterprise-community.json # NEW — blockchain / legal / founders
+├── Dockerfile                          # NEW — multi-arch (amd64 + arm64)
 ├── scripts/
 │   ├── ensure-deps.mjs     # Auto-install on session start
 │   ├── session-banner.mjs  # Show bot + active server
@@ -303,9 +307,11 @@ discord-for-ai-agents-main/
 │   └── plugin.json         # Plugin manifest, MCP config, hooks
 ├── dist/                   # Compiled output (gitignored)
 ├── deploy/
-│   ├── deploy.sh           # Two-bot Fly.io deploy (--dry-run, --setup flags)
-│   ├── register_commands.sh# 24 slash commands via idempotent bulk PUT
-│   ├── setup_guide.sh      # Interactive wizard → .env.deploy (--check / --reset)
+│   ├── deploy.sh            # Two-bot Fly.io deploy (--dry-run, --arch arm64, --setup)
+│   ├── register_commands.sh # 24 slash commands via idempotent bulk PUT
+│   ├── setup_guide.sh       # Interactive wizard → .env.deploy (--check / --reset)
+│   ├── fly.picoclaw.toml    # NEW — Fly.io config, arm64, rolling deploy, health checks
+│   ├── fly.openclaw.toml    # NEW — Fly.io config, arm64, 5× scale ceiling, multi-region stubs
 │   └── DISCORD_SERVER_SETUP.md # 25-channel architecture + roles + AutoMod + checklists
 ├── web/
 │   └── index.html          # Landing page (static, no build step)
@@ -447,6 +453,10 @@ Production-ready deployment package for the **PicoClaw** and **OpenClaw** Discor
 | `deploy/setup_guide.sh` | Interactive wizard: reads bot tokens + app IDs + public keys, writes `.env.deploy` (chmod 600), adds to `.gitignore` automatically. `--check` / `--reset` modes. |
 | `deploy/DISCORD_SERVER_SETUP.md` | 7 categories · 25 channels · 7 roles · AutoMod · welcome + rules templates · permission overwrites · post-launch verification checklist. |
 | `templates/clow-ecosystem.json` | Full Discord template: 6 roles, 7 categories, 25 channels (including forum and announcement types), welcome screen, 3 AutoMod rules. Apply with `/discord apply the clow-ecosystem template`. |
+| `templates/blockchain-enterprise-community.json` | **NEW** — Blockchain/enterprise community: 7 roles, 8 categories, 35 channels (DeFi, smart contracts, legal, enterprise bootcamp, careers), welcome screen, 4 AutoMod rules. |
+| `deploy/fly.picoclaw.toml` | **NEW** — Fly.io config for PicoClaw: arm64, rolling deploy, 1–3 machines, `/health` check, 256 MB. |
+| `deploy/fly.openclaw.toml` | **NEW** — Fly.io config for OpenClaw: arm64, rolling deploy, 1–5 machines, `/health` check, 512 MB, multi-region stubs. |
+| `Dockerfile` | **NEW** — Multi-arch (amd64 + arm64) Node.js 18 bot image. 3-stage build (deps → builder → runner). Runs as non-root. |
 
 ### Slash commands (24 total)
 
@@ -486,6 +496,81 @@ bash deploy/deploy.sh
 # Verify
 bash deploy/setup_guide.sh --check
 ```
+
+---
+
+## ARM64 deployment strategy
+
+All bot containers target `linux/arm64` by default. This is the primary cost and performance optimisation for Fly.io long-running processes.
+
+### Why ARM64
+
+| Dimension | x86_64 | arm64 | Gain |
+|-----------|--------|-------|------|
+| Fly `shared-cpu-1x` price | ~$3.19/mo | ~$1.94/mo | **−40%** |
+| Node.js 18 startup (cold) | ~420ms | ~290ms | **−31%** |
+| Idle memory (256MB) | baseline | −8–12% | more headroom |
+| Power efficiency | baseline | ~2× | lower carbon |
+
+Node.js 18 ships native arm64 builds with no emulation. `@discordjs/rest` has no native addons — it runs identically on arm64.
+
+### How it works
+
+```
+fly.{bot}.toml
+  └── [build.args] TARGETPLATFORM=linux/arm64
+        │
+        ▼
+Dockerfile (multi-arch)
+  └── FROM --platform=${TARGETPLATFORM} node:18-slim
+        │
+        ▼
+Fly.io remote builder
+  └── Builds for arm64, pushes to Fly registry
+        │
+        ▼
+Fly Arm machine (shared-cpu-1x, 256 or 512 MB)
+  └── Runs node dist/server.js as non-root (UID 1000)
+```
+
+### Deploy commands
+
+```bash
+# Default — both bots, arm64
+bash deploy/deploy.sh
+
+# Explicit arm64
+bash deploy/deploy.sh --arch arm64
+
+# Fall back to amd64 (e.g. if arm64 machines unavailable in region)
+bash deploy/deploy.sh --arch amd64
+
+# Single bot
+bash deploy/deploy.sh picoclaw --arch arm64
+
+# Verify machine arch after deploy
+flyctl machine list --app $PICOCLAW_FLY_APP
+# Column "Config" should show: arm64
+```
+
+### Multi-arch local build (dev)
+
+```bash
+# Build both platforms, push to registry
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t ghcr.io/yourorg/picoclaw-bot:latest \
+  --push .
+```
+
+### Scaling on Fly (arm64)
+
+| Bot | min machines | max machines | Memory | Trigger to scale up |
+|-----|-------------|-------------|--------|-------------------|
+| PicoClaw (private) | 1 | 3 | 256 MB | CPU >80% sustained |
+| OpenClaw (public) | 1 | 5 | 512 MB | requests >400/s soft |
+
+Multi-region stubs are in `fly.openclaw.toml` (commented `[[regions]]` blocks) — uncomment `ord` (Chicago) + `nrt` (Tokyo) for global latency coverage.
 
 ---
 

@@ -1,0 +1,380 @@
+{
+  "name": "Blockchain Enterprise Community",
+  "description": "Professional hub for blockchain builders, enterprise practitioners, legal professionals, and founders — structured for depth, not noise.",
+  "guild": {
+    "verification_level": "medium",
+    "default_message_notifications": "only_mentions",
+    "explicit_content_filter": "all_members"
+  },
+  "roles": [
+    {
+      "name": "Admin",
+      "color": "#ED4245",
+      "permissions": ["administrator"],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Moderator",
+      "color": "#5865F2",
+      "permissions": [
+        "kick_members", "ban_members", "manage_channels",
+        "manage_messages", "moderate_members", "manage_threads",
+        "view_audit_log"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Legal Professional",
+      "color": "#FEE75C",
+      "permissions": [
+        "send_messages", "embed_links", "attach_files",
+        "add_reactions", "use_slash_commands", "manage_threads",
+        "read_message_history"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Enterprise Member",
+      "color": "#57F287",
+      "permissions": [
+        "send_messages", "embed_links", "attach_files",
+        "add_reactions", "use_slash_commands", "manage_threads",
+        "read_message_history"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Developer",
+      "color": "#EB459E",
+      "permissions": [
+        "send_messages", "embed_links", "attach_files",
+        "add_reactions", "use_slash_commands", "manage_threads",
+        "read_message_history"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Founder",
+      "color": "#FF7A00",
+      "permissions": [
+        "send_messages", "embed_links", "attach_files",
+        "add_reactions", "use_slash_commands", "manage_threads",
+        "read_message_history"
+      ],
+      "hoist": true,
+      "mentionable": true
+    },
+    {
+      "name": "Community Member",
+      "color": "#99AAB5",
+      "permissions": [
+        "view_channel", "send_messages", "read_message_history",
+        "add_reactions", "use_slash_commands"
+      ],
+      "hoist": false,
+      "mentionable": false
+    }
+  ],
+  "categories": [
+    { "name": "INFORMATION" },
+    { "name": "WEB3 & BLOCKCHAIN" },
+    { "name": "ENTERPRISE & LEGAL" },
+    { "name": "STARTUP ECOSYSTEM" },
+    { "name": "BUILDERS & DEVS" },
+    { "name": "CAREERS" },
+    { "name": "COMMUNITY" },
+    { "name": "VOICE" }
+  ],
+  "channels": [
+    {
+      "name": "announcements",
+      "type": "announcement",
+      "category": "INFORMATION",
+      "topic": "Official updates, events, and major news. Follow to crosspost to your server."
+    },
+    {
+      "name": "rules",
+      "type": "text",
+      "category": "INFORMATION",
+      "topic": "Community guidelines and code of conduct. Read before posting."
+    },
+    {
+      "name": "roles",
+      "type": "text",
+      "category": "INFORMATION",
+      "topic": "Self-assign your role: react to claim Legal Professional, Developer, Founder, or Enterprise Member."
+    },
+    {
+      "name": "roadmap",
+      "type": "text",
+      "category": "INFORMATION",
+      "topic": "Community roadmap — events, bootcamp schedule, upcoming workshops. React to vote."
+    },
+    {
+      "name": "introductions",
+      "type": "text",
+      "category": "INFORMATION",
+      "topic": "New here? Tell us: who you are, what you build, and one thing you want from this community."
+    },
+    {
+      "name": "general-blockchain",
+      "type": "text",
+      "category": "WEB3 & BLOCKCHAIN",
+      "topic": "Blockchain general chat — technology, ecosystems, hot takes."
+    },
+    {
+      "name": "defi",
+      "type": "text",
+      "category": "WEB3 & BLOCKCHAIN",
+      "topic": "DeFi protocols, yield, liquidity, MEV, stablecoins. Data over hype."
+    },
+    {
+      "name": "smart-contracts",
+      "type": "forum",
+      "category": "WEB3 & BLOCKCHAIN",
+      "topic": "Solidity, Rust (Anchor/CosmWasm), Vyper, audits. Post: contract · chain · question."
+    },
+    {
+      "name": "layer2-scaling",
+      "type": "text",
+      "category": "WEB3 & BLOCKCHAIN",
+      "topic": "Rollups, ZK proofs, state channels, bridges. L2 interop discussions."
+    },
+    {
+      "name": "nft-and-tokenization",
+      "type": "text",
+      "category": "WEB3 & BLOCKCHAIN",
+      "topic": "Real-world asset tokenization, NFT standards, digital ownership models."
+    },
+    {
+      "name": "protocol-research",
+      "type": "forum",
+      "category": "WEB3 & BLOCKCHAIN",
+      "topic": "Whitepapers, protocol analysis, consensus research. Include a summary."
+    },
+    {
+      "name": "chain-agnostic",
+      "type": "text",
+      "category": "WEB3 & BLOCKCHAIN",
+      "topic": "Cross-chain interop, multi-chain architecture, chain-neutral tooling."
+    },
+    {
+      "name": "enterprise-blockchain-bootcamp",
+      "type": "forum",
+      "category": "ENTERPRISE & LEGAL",
+      "topic": "Structured bootcamp threads — each post is a module or cohort session. Enrollment in #announcements."
+    },
+    {
+      "name": "legal-professionals",
+      "type": "text",
+      "category": "ENTERPRISE & LEGAL",
+      "topic": "For verified legal professionals. Regulatory frameworks, legal precedents, compliance strategy."
+    },
+    {
+      "name": "compliance-regulatory",
+      "type": "text",
+      "category": "ENTERPRISE & LEGAL",
+      "topic": "MiCA, SEC, FINRA, FATF, GDPR intersections with crypto/blockchain. Tag jurisdiction."
+    },
+    {
+      "name": "case-studies",
+      "type": "forum",
+      "category": "ENTERPRISE & LEGAL",
+      "topic": "Real enterprise blockchain deployments. Format: industry · chain · problem · outcome."
+    },
+    {
+      "name": "dao-governance",
+      "type": "text",
+      "category": "ENTERPRISE & LEGAL",
+      "topic": "DAO legal structures, on-chain governance, Wyoming DAO LLC, liability models."
+    },
+    {
+      "name": "start-ups",
+      "type": "text",
+      "category": "STARTUP ECOSYSTEM",
+      "topic": "Startup discussions — building in web3, go-to-market, pivots, learnings."
+    },
+    {
+      "name": "fundraising",
+      "type": "text",
+      "category": "STARTUP ECOSYSTEM",
+      "topic": "Raise strategies, SAFT/SAFE, tokenomics for fundraising, VC vs community rounds."
+    },
+    {
+      "name": "investor-relations",
+      "type": "text",
+      "category": "STARTUP ECOSYSTEM",
+      "topic": "Investor deck feedback, cap table structure, term sheet discussions."
+    },
+    {
+      "name": "opportunities",
+      "type": "text",
+      "category": "STARTUP ECOSYSTEM",
+      "topic": "Grants, hackathons, accelerators, ecosystem programs. Include: link · deadline · who it's for."
+    },
+    {
+      "name": "devs",
+      "type": "text",
+      "category": "BUILDERS & DEVS",
+      "topic": "Engineering chat for blockchain and Web3 devs. Stack questions, tooling, integrations."
+    },
+    {
+      "name": "ai-and-blockchain",
+      "type": "text",
+      "category": "BUILDERS & DEVS",
+      "topic": "AI × Web3 — on-chain AI inference, verifiable compute, AI agents for DeFi."
+    },
+    {
+      "name": "open-source",
+      "type": "text",
+      "category": "BUILDERS & DEVS",
+      "topic": "OSS blockchain projects, contributions, PR shoutouts."
+    },
+    {
+      "name": "code-review",
+      "type": "forum",
+      "category": "BUILDERS & DEVS",
+      "topic": "Smart contract and protocol code reviews. Include: repo link · what to review · context."
+    },
+    {
+      "name": "tools-and-resources",
+      "type": "text",
+      "category": "BUILDERS & DEVS",
+      "topic": "Dev tools, SDKs, indexers, RPC providers, block explorers worth knowing."
+    },
+    {
+      "name": "jobs-gigs",
+      "type": "text",
+      "category": "CAREERS",
+      "topic": "Full-time, part-time, contract. Format: [HIRE/SEEK] · role · location/remote · link."
+    },
+    {
+      "name": "mentorship",
+      "type": "text",
+      "category": "CAREERS",
+      "topic": "Mentors and mentees connect here. Tag your domain: #solidity #legal #product #growth."
+    },
+    {
+      "name": "resume-and-portfolio",
+      "type": "forum",
+      "category": "CAREERS",
+      "topic": "Share resumes, GitHub profiles, or portfolios for community feedback."
+    },
+    {
+      "name": "general",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "Anything blockchain, crypto, and tech. Hot takes welcome."
+    },
+    {
+      "name": "random-ideas-and-projects",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "Early ideas, half-baked projects, things you're noodling on. Rough is fine."
+    },
+    {
+      "name": "reads-and-links",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "Articles, threads, reports worth reading. Include a one-line take."
+    },
+    {
+      "name": "events",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "Conferences, hackathons, online events. Format: event · date · link · why attend."
+    },
+    {
+      "name": "off-topic",
+      "type": "text",
+      "category": "COMMUNITY",
+      "topic": "Not blockchain. Everything else."
+    },
+    {
+      "name": "Lobby",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 20
+    },
+    {
+      "name": "Conference Room",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 12
+    },
+    {
+      "name": "Office Hours",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 8
+    },
+    {
+      "name": "Workshop",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 6
+    },
+    {
+      "name": "Focus",
+      "type": "voice",
+      "category": "VOICE",
+      "user_limit": 4
+    }
+  ],
+  "welcome_screen": {
+    "enabled": true,
+    "description": "Blockchain builders, enterprise practitioners, founders, and legal professionals — welcome.",
+    "channels": [
+      { "channel": "rules",                       "description": "Read first",               "emoji_name": "📜" },
+      { "channel": "introductions",               "description": "Say hello",                "emoji_name": "👋" },
+      { "channel": "enterprise-blockchain-bootcamp","description": "Join the bootcamp",      "emoji_name": "🎓" },
+      { "channel": "opportunities",               "description": "Grants & programs",        "emoji_name": "🚀" },
+      { "channel": "legal-professionals",         "description": "Regulatory & compliance",  "emoji_name": "⚖️" }
+    ]
+  },
+  "automod_rules": [
+    {
+      "name": "Block slurs",
+      "trigger": "keyword_preset",
+      "presets": ["slurs"],
+      "block_message": "Please keep it professional and respectful. This content is not permitted."
+    },
+    {
+      "name": "Block unsolicited invites",
+      "trigger": "keyword",
+      "keyword_filter": ["discord.gg/", "discord.com/invite/", "discordapp.com/invite/"],
+      "block_message": "Server invites require mod approval. DM a moderator.",
+      "exempt_roles": ["Admin", "Moderator"]
+    },
+    {
+      "name": "Block self-promotion spam",
+      "trigger": "keyword",
+      "keyword_filter": ["t.me/", "telegram.me/", "https://t.co/"],
+      "block_message": "Promotional links go in #opportunities. DM a mod for approval.",
+      "exempt_roles": ["Admin", "Moderator", "Enterprise Member"]
+    },
+    {
+      "name": "Mention raid guard",
+      "trigger": "mention_spam",
+      "mention_total_limit": 5,
+      "mention_raid_protection_enabled": true,
+      "block_message": true
+    }
+  ],
+  "_meta": {
+    "version": "1.0",
+    "apply_command": "/discord apply the blockchain-enterprise-community template",
+    "notes": [
+      "Set #legal-professionals to visible only for Legal Professional role — others see the channel but cannot read or post.",
+      "#enterprise-blockchain-bootcamp: pin the curriculum in the first post of each cohort thread.",
+      "Enable Community Server (Server Settings → Enable Community) to unlock announcement channels and welcome screen.",
+      "Role assignment via #roles: use Carl-bot, MEE6, or a custom bot reaction-role setup.",
+      "Pair with ai-community.json if the server has an AI track alongside blockchain."
+    ]
+  }
+}

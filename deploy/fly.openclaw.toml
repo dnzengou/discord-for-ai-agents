@@ -1,0 +1,84 @@
+# =============================================================================
+# fly.openclaw.toml — Fly.io config for OpenClaw (community AI bot)
+# Architecture: arm64 — same ARM strategy as PicoClaw.
+# OpenClaw serves a larger, public audience so scaling limits are wider.
+# =============================================================================
+# Usage:
+#   flyctl deploy --config deploy/fly.openclaw.toml --remote-only
+#   flyctl status  --config deploy/fly.openclaw.toml
+# =============================================================================
+
+app       = "openclaw-bot"        # REPLACE with your actual Fly app name
+primary_region = "cdg"            # Paris — adjust per your Discord guild location
+kill_signal    = "SIGINT"
+kill_timeout   = 10
+
+# ─── Build ────────────────────────────────────────────────────────────────────
+[build]
+  dockerfile = "../Dockerfile"
+
+  [build.args]
+    TARGETPLATFORM = "linux/arm64"
+    TARGETARCH     = "arm64"
+    NODE_ENV       = "production"
+    BOT_NAME       = "openclaw"
+
+# ─── Runtime env ─────────────────────────────────────────────────────────────
+[env]
+  NODE_ENV          = "production"
+  BOT_NAME          = "openclaw"
+  PORT              = "3000"
+  LOG_LEVEL         = "info"
+
+# ─── HTTP service (Discord interactions webhook endpoint) ─────────────────────
+[[services]]
+  protocol      = "tcp"
+  internal_port = 3000
+
+  [[services.ports]]
+    port     = 443
+    handlers = ["tls", "http"]
+  [[services.ports]]
+    port     = 80
+    handlers = ["http"]
+    [services.ports.http_options]
+      redirect = true
+
+  [[services.http_checks]]
+    interval       = "15s"
+    timeout        = "5s"
+    grace_period   = "10s"
+    method         = "GET"
+    path           = "/health"
+    protocol       = "http"
+    restart_limit  = 3
+
+  # OpenClaw is public-facing — higher concurrency ceiling
+  [services.concurrency]
+    type       = "requests"
+    hard_limit = 500
+    soft_limit = 400
+
+# ─── VM sizing (ARM) ─────────────────────────────────────────────────────────
+# OpenClaw handles more concurrent users — bump to 512mb if AI inference is done
+# in-process; keep 256mb if all inference is delegated to an external API.
+[vm]
+  size   = "shared-cpu-1x"
+  memory = "512mb"
+
+# ─── Scaling ─────────────────────────────────────────────────────────────────
+[scaling]
+  min_machines_running = 1
+  max_machines_running = 5    # community bot can spike on popular guilds
+
+# ─── Deployment strategy ─────────────────────────────────────────────────────
+[deploy]
+  strategy     = "rolling"
+  wait_timeout = "120s"
+  release_command = "node dist/migrate.js || true"
+
+# ─── Multi-region (uncomment to add a second region for lower latency) ────────
+# [[regions]]
+#   region = "ord"   # Chicago — covers North America
+# [[regions]]
+#   region = "nrt"   # Tokyo — covers Asia-Pacific

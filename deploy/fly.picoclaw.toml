@@ -1,0 +1,90 @@
+# =============================================================================
+# fly.picoclaw.toml — Fly.io config for PicoClaw (private dev bot)
+# Architecture: arm64 (Fly.io Arm machines — ~40% cheaper than x86_64,
+#               better perf-per-watt for long-running Node.js processes)
+# =============================================================================
+# Usage:
+#   flyctl deploy --config deploy/fly.picoclaw.toml --remote-only
+#   flyctl status  --config deploy/fly.picoclaw.toml
+# =============================================================================
+
+app       = "picoclaw-bot"        # REPLACE with your actual Fly app name
+primary_region = "cdg"            # Paris — adjust to region closest to your Discord guild
+kill_signal    = "SIGINT"
+kill_timeout   = 10
+
+# ─── Build ────────────────────────────────────────────────────────────────────
+# Multi-arch: the TARGETPLATFORM build arg is passed to the Dockerfile
+# so `FROM --platform=$TARGETPLATFORM node:18-slim` picks the arm64 layer.
+[build]
+  dockerfile = "../Dockerfile"
+
+  [build.args]
+    TARGETPLATFORM = "linux/arm64"
+    TARGETARCH     = "arm64"
+    NODE_ENV       = "production"
+    BOT_NAME       = "picoclaw"
+
+# ─── Runtime env ─────────────────────────────────────────────────────────────
+# Secrets (tokens, keys) are set via `flyctl secrets set` — never in this file.
+[env]
+  NODE_ENV          = "production"
+  BOT_NAME          = "picoclaw"
+  PORT              = "3000"
+  LOG_LEVEL         = "info"
+  # Fly injects FLY_REGION, FLY_APP_NAME, FLY_ALLOC_ID automatically
+
+# ─── HTTP service (Discord interactions webhook endpoint) ─────────────────────
+[[services]]
+  protocol    = "tcp"
+  internal_port = 3000
+
+  [[services.ports]]
+    port     = 443
+    handlers = ["tls", "http"]
+  [[services.ports]]
+    port     = 80
+    handlers = ["http"]
+    [services.ports.http_options]
+      redirect = true     # force HTTPS
+
+  # Discord requires your interactions URL to return 200 within 3s
+  [[services.http_checks]]
+    interval       = "15s"
+    timeout        = "5s"
+    grace_period   = "10s"
+    method         = "GET"
+    path           = "/health"
+    protocol       = "http"
+    restart_limit  = 3
+
+  [services.concurrency]
+    type       = "requests"
+    hard_limit = 200
+    soft_limit = 150
+
+# ─── VM sizing (ARM) ─────────────────────────────────────────────────────────
+# Fly.io arm64 shared machines — cost-efficient for always-on bots.
+# shared-cpu-1x @arm64 ≈ $1.94/mo vs $3.19/mo for equivalent x86_64.
+# Upgrade to shared-cpu-2x if you see >80% CPU on busy guilds.
+[vm]
+  size   = "shared-cpu-1x"
+  memory = "256mb"
+  # Fly.io selects arm64 hardware when the image is built for linux/arm64.
+  # No explicit cpu_kind needed — the image architecture drives placement.
+
+# ─── Scaling ─────────────────────────────────────────────────────────────────
+[scaling]
+  min_machines_running = 1    # keep one instance warm — Discord needs <3s latency
+  max_machines_running = 3    # scale out on spike (e.g. bootcamp events)
+
+# ─── Deployment strategy ─────────────────────────────────────────────────────
+[deploy]
+  strategy        = "rolling"   # zero-downtime: new machines start before old stop
+  wait_timeout    = "120s"
+  release_command = "node dist/migrate.js || true"  # no-op if no migration script
+
+# ─── Metrics (optional — remove if not using Prometheus) ─────────────────────
+# [metrics]
+#   port = 9091
+#   path = "/metrics"

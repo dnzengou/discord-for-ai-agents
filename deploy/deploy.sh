@@ -5,11 +5,13 @@
 # Platform: Fly.io (flyctl) — swap DEPLOY_TARGET for other platforms
 # =============================================================================
 # Usage:
-#   bash deploy.sh                 # deploy both bots
+#   bash deploy.sh                 # deploy both bots (default: arm64)
 #   bash deploy.sh picoclaw        # deploy PicoClaw only
 #   bash deploy.sh openclaw        # deploy OpenClaw only
 #   bash deploy.sh --dry-run       # validate env + config, no actual deploy
 #   bash deploy.sh --setup         # run interactive setup_guide.sh first
+#   bash deploy.sh --arch amd64    # override target architecture (default: arm64)
+#   bash deploy.sh --arch arm64    # explicit arm64 (Fly.io Arm machines)
 # =============================================================================
 
 set -euo pipefail
@@ -26,19 +28,32 @@ step() { echo -e "\n${BOLD}$*${RESET}"; }
 
 # ─── Argument parsing ────────────────────────────────────────────────────────
 DRY_RUN=0
-TARGET="both"   # picoclaw | openclaw | both
-for arg in "$@"; do
+TARGET="both"        # picoclaw | openclaw | both
+TARGET_ARCH="arm64"  # arm64 (default — Fly Arm machines) | amd64
+DEPLOY_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+args=("$@")
+i=0
+while [[ $i -lt ${#args[@]} ]]; do
+  arg="${args[$i]}"
   case "$arg" in
     --dry-run)    DRY_RUN=1 ;;
-    --setup)      bash "$(dirname "$0")/setup_guide.sh" ;;
+    --setup)      bash "$DEPLOY_DIR/setup_guide.sh" ;;
+    --arch)
+      i=$((i + 1))
+      TARGET_ARCH="${args[$i]:-arm64}"
+      if [[ "$TARGET_ARCH" != "arm64" && "$TARGET_ARCH" != "amd64" ]]; then
+        err "Invalid --arch value: $TARGET_ARCH (must be arm64 or amd64)"; exit 1
+      fi ;;
     picoclaw)     TARGET="picoclaw" ;;
     openclaw)     TARGET="openclaw" ;;
     both)         TARGET="both" ;;
     -h|--help)
-      sed -n '3,15p' "$0" | sed 's/# \?//'
+      sed -n '3,17p' "$0" | sed 's/# \?//'
       exit 0 ;;
     *) err "Unknown argument: $arg"; exit 1 ;;
   esac
+  i=$((i + 1))
 done
 
 # ─── Banner ──────────────────────────────────────────────────────────────────
@@ -48,6 +63,8 @@ echo "  ║   Clow Bots — Discord GTM Deploy         ║"
 echo "  ║   PicoClaw · OpenClaw · deeptechx        ║"
 echo "  ╚══════════════════════════════════════════╝"
 echo -e "${RESET}"
+info "Target architecture : ${TARGET_ARCH}"
+info "Deployment target   : ${TARGET}"
 [[ $DRY_RUN -eq 1 ]] && warn "DRY-RUN mode — no changes will be applied"
 
 # ─── Required env validation ─────────────────────────────────────────────────
@@ -172,9 +189,20 @@ step "5/5  Deploying bots"
 
 _deploy_fly() {
   local bot="$1" fly_app="$2" token_var="$3" pubkey_var="$4" appid_var="$5"
-  info "Deploying $bot → Fly.io app: $fly_app"
+  local bot_lower; bot_lower="$(echo "$bot" | tr '[:upper:]' '[:lower:]')"
+  local fly_config="$DEPLOY_DIR/fly.${bot_lower}.toml"
 
-  # Set secrets on the Fly app (idempotent)
+  info "Deploying $bot → Fly.io app: $fly_app (arch: $TARGET_ARCH)"
+
+  # Validate fly.toml exists
+  if [[ ! -f "$fly_config" ]]; then
+    warn "fly.toml not found at $fly_config — deploying without explicit config"
+    fly_config=""
+  else
+    info "Using config: $fly_config"
+  fi
+
+  # Set secrets on the Fly app (idempotent — Fly deduplicates unchanged secrets)
   "$DEPLOY_METHOD" secrets set \
     DISCORD_BOT_TOKEN="${!token_var}" \
     DISCORD_PUBLIC_KEY="${!pubkey_var}" \
@@ -183,12 +211,18 @@ _deploy_fly() {
     warn "Could not set secrets via flyctl — ensure you're authenticated: flyctl auth login"
   }
 
-  # Deploy
-  "$DEPLOY_METHOD" deploy \
-    --app "$fly_app" \
-    --remote-only \
-    --auto-confirm 2>&1 | tail -20
-  ok "$bot deployed to $fly_app"
+  # Build the deploy command with optional --config and ARM build args
+  local deploy_args=(
+    --app "$fly_app"
+    --remote-only
+    --auto-confirm
+    --build-arg "TARGETPLATFORM=linux/${TARGET_ARCH}"
+    --build-arg "TARGETARCH=${TARGET_ARCH}"
+  )
+  [[ -n "$fly_config" ]] && deploy_args+=(--config "$fly_config")
+
+  "$DEPLOY_METHOD" deploy "${deploy_args[@]}" 2>&1 | tail -25
+  ok "$bot deployed to $fly_app (${TARGET_ARCH})"
 }
 
 _deploy_curl() {
@@ -229,8 +263,10 @@ echo -e "${GREEN}${BOLD}╔═════════════════�
 echo -e "${GREEN}${BOLD}║   Deploy complete!                       ║${RESET}"
 echo -e "${GREEN}${BOLD}╚══════════════════════════════════════════╝${RESET}"
 echo ""
+echo "  Architecture : ${TARGET_ARCH}"
 echo "  Next steps:"
 echo "  • Verify bots are online: /status in Discord"
+echo "  • Check Fly machine arch: flyctl machine list --app \$PICOCLAW_FLY_APP"
 echo "  • Run /discord:setup if you haven't configured the active server"
 echo "  • See DISCORD_SERVER_SETUP.md for the full channel + role architecture"
 echo ""
