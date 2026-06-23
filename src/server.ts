@@ -20,6 +20,7 @@ import { registerGuildTools } from './tools/guild.js';
 import { registerMemberTools } from './tools/members.js';
 import { registerWebhookTools } from './tools/webhooks.js';
 import { registerTemplateTools } from './tools/template.js';
+import { registerThreadTools } from './tools/threads.js';
 import { registerRawTool } from './tools/raw.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -44,6 +45,7 @@ registerGuildTools(server);
 registerMemberTools(server);
 registerWebhookTools(server);
 registerTemplateTools(server);
+registerThreadTools(server);
 registerRawTool(server);
 
 async function main() {
