@@ -1,6 +1,6 @@
 # Discord for AI Agents — Production Blueprint
 
-> Updated 2026-05-23. Karpathy-style: every line earns its place.
+> Updated 2026-06-23. Karpathy-style: every line earns its place.
 >
 > **Landing page:** live at **https://discord-for-ai-agents-main.vercel.app** · deployed from `web/index.html`. Config: `vercel.json` + `netlify.toml`.
 
@@ -43,7 +43,7 @@ skills/setup/SKILL.md  skills/discord/SKILL.md
 
 ---
 
-## Tools (54 total)
+## Tools (64 total)
 
 ### Auth & State
 | Tool | What |
@@ -142,6 +142,20 @@ skills/setup/SKILL.md  skills/discord/SKILL.md
 | `discord_list_templates` | Bundled JSON templates |
 | `discord_apply_template` | Bulk-create roles/channels/etc. (idempotent, create-only) |
 
+### Threads
+| Tool | What |
+|------|------|
+| `discord_create_thread` | **NEW** — public/private/announcement, standalone or from a message |
+| `discord_list_active_threads` | **NEW** — guild-wide active threads + joined-member entries |
+| `discord_list_archived_threads` | **NEW** — public or private archived, paginated via `before` + `limit` |
+| `discord_modify_thread` | **NEW** — archive, lock, rename, slowmode, auto-archive duration |
+| `discord_delete_thread` | **NEW** — destructive; archive first if reversibility matters |
+| `discord_join_thread` | **NEW** — bot joins (required before sending in private threads) |
+| `discord_leave_thread` | **NEW** — bot leaves; thread persists |
+| `discord_add_thread_member` | **NEW** — invite a user to the thread |
+| `discord_remove_thread_member` | **NEW** — destructive — kick from thread |
+| `discord_list_thread_members` | **NEW** — minimal member entries (no GUILD_MEMBERS intent needed) |
+
 ### Escape Hatch
 | Tool | What |
 |------|------|
@@ -163,6 +177,16 @@ skills/setup/SKILL.md  skills/discord/SKILL.md
 | `blockchain-enterprise-community` | **NEW** — blockchain builders, founders, legal professionals, enterprise practitioners. 7 roles, 8 categories, 35 channels, 4 AutoMod rules |
 
 Each template creates: roles → categories → channels → welcome screen → AutoMod rules, in order. Anything matching an existing entity by name is silently skipped — safe to re-apply.
+
+---
+
+## Threads (src/tools/threads.ts)
+
+Two creation modes: **channel mode** (standalone thread under a text/announcement channel) and **message mode** (thread off an existing message — inherits channel type). `discord_create_thread` switches via the optional `message_id` arg. Forum/media threads are created implicitly by `discord_send_message` to the parent — no thread tool needed there.
+
+Archive is reversible (`discord_modify_thread` with `archived=false`); delete is not. Public threads auto-include the bot on first message; private threads require `discord_join_thread` first. `auto_archive_minutes` accepts only 60 / 1440 / 4320 / 10080 (Discord-enforced).
+
+Cache invalidation: thread mutations call `invalidateGuildChannels()` — threads appear in `discord_list_channels` once active, so the channels cache must drop after any thread change.
 
 ---
 
@@ -281,6 +305,7 @@ discord-for-ai-agents-main/
 │       ├── roles.ts       # (cache-enabled)
 │       ├── scheduled-events.ts
 │       ├── template.ts
+│       ├── threads.ts    # (+ 10 thread tools)
 │       ├── webhooks.ts
 │       ├── welcome-screen.ts
 │       └── whoami.ts
@@ -576,7 +601,6 @@ Multi-region stubs are in `fly.openclaw.toml` (commented `[[regions]]` blocks) �
 
 ## What to build next (not in scope now)
 
-- **Thread management tools** — `discord_create_thread`, `discord_archive_thread`
 - **Slash command registration** — register application commands via the bot
 - **Voice state tools** — move/mute members in voice (wraps PATCH /guilds/{id}/members/{id})
 - **Audit log reader** — `discord_get_audit_log` for accountability dashboards
